@@ -15,7 +15,7 @@ import math
 import json
 import logging
 from CDS_Auto_Import_tools import sqlite_interface
-# from CDS_Auto_Import_tools import mysql_interface
+from CDS_Auto_Import_tools import mysql_interface
 from CDS_Auto_Import_tools import request_shuma_cdn
 from CDS_Auto_Import_tools import xml_parser
 
@@ -71,16 +71,16 @@ class SqliteQuery(object):
             m_dict = json.loads(in_tuple[0], strict=False)
             status_bytes = xml_parser.XmlParser.get_query_str(in_tuple[3].encode(encoding='utf-8'),
                                                               'DeleteContent', 201)
-            print(status_bytes)
-            # if in_tuple[2] == 1:
-            #     mysql_interface.mysql_delete_url(m_dict['url'])
-            #     request_shuma_cdn.RequestCDN.delete_content(status_bytes)
-            # elif int(in_tuple[1]) == 3:
-            #     request_shuma_cdn.RequestCDN.delete_content(status_bytes)
-            # elif int(in_tuple[1]) == 2:
-            #     request_shuma_cdn.RequestCDN.delete_content(status_bytes)
-            # elif int(in_tuple[1]) == 1:
-            #     request_shuma_cdn.RequestCDN.delete_content(status_bytes)
+            # print(status_bytes)
+            if in_tuple[2] == 1:
+                mysql_interface.mysql_delete_url(m_dict['url'])
+                request_shuma_cdn.RequestCDN.delete_content(status_bytes)
+            elif int(in_tuple[1]) == 3:
+                request_shuma_cdn.RequestCDN.delete_content(status_bytes)
+            elif int(in_tuple[1]) == 2:
+                request_shuma_cdn.RequestCDN.delete_content(status_bytes)
+            elif int(in_tuple[1]) == 1:
+                request_shuma_cdn.RequestCDN.delete_content(status_bytes)
 
 
 if __name__ == '__main__':

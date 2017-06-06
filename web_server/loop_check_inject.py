@@ -16,7 +16,7 @@ import requests
 from CDS_Auto_Import_tools import sqlite_interface
 from CDS_Auto_Import_tools import parameters_parse
 from CDS_Auto_Import_tools import xml_parser
-# from CDS_Auto_Import_tools import mysql_interface
+from CDS_Auto_Import_tools import mysql_interface
 from CDS_Auto_Import_tools import request_shuma_cdn
 
 log_root = logging.getLogger('web_server')

@@ -84,8 +84,8 @@ if __name__ == '__main__':
                             if o_xml_str:
                                 sq_dict['req_xml_str'] = o_xml_str.decode()
                                 str_xml_str = sq_dict['req_xml_str'].replace('amp;', '')
-                                # s_code = RequestCDN.transfer_content(str_xml_str.encode(encoding='utf-8'))
-                                s_code = 200
+                                s_code = RequestCDN.transfer_content(str_xml_str.encode(encoding='utf-8'))
+                                # s_code = 200
                                 if s_code == 200:
                                     sq_dict['transfer_content_ret_code'] = 200
                                     sq_dict['status'] = 1

@@ -11,10 +11,7 @@ import logging
 import sys
 import traceback
 import requests
-# sys.path.insert(0, os.path.abspath('./'))
-# print(os.path.abspath('./'))
-# import parameters_parse
-# import xml_parser
+
 
 from CDS_Auto_Import_tools import parameters_parse
 from CDS_Auto_Import_tools import xml_parser
