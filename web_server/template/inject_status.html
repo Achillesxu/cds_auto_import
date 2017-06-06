@@ -1,0 +1,103 @@
+<style>
+    th {
+        width: 100px;
+        display: block;
+        word-break: keep-all;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    th:hover {
+        width: auto;
+    }
+</style>
+
+<div>
+    <table class="altrowstable" id="alternatecolor">
+
+        <tr>
+            <td>delete</td>
+            <td>id</td>
+            <td>media_id</td>
+            <td>cid</td>
+            <td>asset_id</td>
+            <td>mysql_url_row</td>
+            <td>status</td>
+            <td>transfer_status</td>
+            <td>is_mysql_insert</td>
+        </tr>
+
+        <?py for record in record_list: ?>
+        <tr>
+            <td><a href="/delete_record?rid=#{record[0]}&cur_page=#{current_page}" title="delete this items from table"
+                   class="button info">delete</a></td>
+            <td>#{record[0]}</td>
+            <td>#{record[1]}</td>
+            <td>#{record[2]}</td>
+            <td>#{record[3]}</td>
+            <td>#{record[4]}</td>
+            <td>#{record[5]}</td>
+            <td>#{record[6]}</td>
+            <td>#{record[7]}</td>
+        </tr>
+        <?py #endfor ?>
+
+    </table>
+</div>
+<p id="page_list">
+
+    <?py if total_page > 1: ?>
+    <?py page_list = []
+    show_page_num = 10
+    if total_page > show_page_num:
+    from_page = current_page - show_page_num/2
+    if from_page<1:
+    from_page = 1
+    #endif
+    to_page = from_page + show_page_num
+    if to_page > total_page:
+    from_page = total_page - show_page_num
+    to_page = total_page
+    #endif
+    else:
+    from_page = 1
+    to_page = total_page
+    #endif
+
+    if total_page > 1:
+    if from_page > 2:
+    page_list.append('<span>...</span>')
+    #endif
+    for i in range(from_page, to_page+1):
+    if i == current_page:
+    page_list.append('<a href="#" class="page action">%d</a>' % (i))
+    elif i == current_page+1:
+    page_list.append('<a href="/inject_status?page=%d" class="page">%d</a>' % (i, i))
+    else:
+    page_list.append('<a href="/inject_status?page=%d" class="page">%d</a>' % (i, i))
+    #endif
+    #endfor
+    if to_page < total_page-1:
+    page_list.append('<span>...</span>')
+    #endif
+    #endif
+    page_str = '\n'.join(page_list)
+    ?>
+    <?py if current_page > 1: ?>
+    <a href="/inject_status?page=#{current_page - 1}" class="page page_prev">&lt;</a>
+    <?py if total_page > show_page_num and current_page > (show_page_num/2 + 1): ?>
+    <a href="/inject_status?page=1" class="page page_first">1</a>
+    <?py #endif ?>
+    <?py #endif ?>
+    #{page_str}
+    <?py if current_page < total_page: ?>
+    <?py if total_page > show_page_num and current_page < (total_page - show_page_num/2): ?>
+    <a href="/inject_status?page=#{total_page}" class="page page_last">#{total_page}</a>
+    <?py #endif ?>
+    <a href="/inject_status?page=#{current_page+1}" class="page page_next">&gt;</a>
+    <?py #endif ?>
+
+    <?py #endif ?>
+</p>
+

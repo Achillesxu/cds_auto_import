@@ -1,0 +1,35 @@
+#page_list {
+    text-align: center;
+    margin: 25px 0 40px 0;
+}
+
+#page_list .page {
+    font-size: 20px;
+    color: #404040;
+    line-height: 30px;
+    display: inline-block;
+    border: 1px solid #FFF;
+    padding: 0px 6px;
+    margin: 0px 5px;
+}
+
+#page_list .action {
+    background-color: #2AA468;
+    color: #FFF;
+    border: 1px solid #FFF;
+}
+
+#page_list .page:hover {
+    border: 1px solid #E1E1E1;
+}
+
+#page_list .page_ellipsis {
+    font-size: 20px;
+    color: #404040;
+    cursor: default;
+    margin: 0px 10px;
+}
+
+#page_list .hidden {
+    display: none;
+}
