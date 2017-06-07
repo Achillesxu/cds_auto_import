@@ -71,6 +71,14 @@ if __name__ == '__main__':
                             if max_asset_id is None:
                                 sqlite_interface.insert_cid_cid_table(media_cid_serial, 1)
                             else:
+                                if int(max_asset_id) > 199998:
+                                    print("""Warning:
+                                    
+                                    inject media count exceed 199999, 
+                                    please contact achilles_xushy to resolve this problem
+                                    
+                                    """)
+                                    sys.exit()
                                 sqlite_interface.insert_cid_cid_table(media_cid_serial, max_asset_id + 1)
 
                         new_cid_set_d = sqlite_interface.get_cid_query_result(media_cid_serial)
