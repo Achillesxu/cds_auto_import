@@ -73,6 +73,8 @@ def loop_check_inject_insert_mysql():
                         if fail_sign is True:
                             g_status = -1
                             data_ret = sqlite_interface.delete_data_from_cdn_id(asset_id)
+                            sqlite_interface.delete_entity_from_cid_table(int(asset_id) - 100000)
+                            sqlite_interface.insert_one_deleted_asset_id(int(asset_id) - 100000)
                             if data_ret is None and g_status == -1:
                                 log_root.error('asset_id={}, g_status={}, post data = {}, database delete failed'.
                                                format(asset_id, g_status, ret_xml))
