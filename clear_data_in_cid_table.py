@@ -32,9 +32,14 @@ def clear_data_in_cid_table():
     for i_t in result_tuple_list:
         asset_id_list.append(int(i_t[3]) - 100000)
 
-    max_asset_id = sqlite_interface.get_max_id_from_cid_table()
+    del_asset_list = []
 
-    del_asset_list = [i for i in range(1, max_asset_id + 1)]
+    en_t_list = sqlite_interface.get_all_asset_id_from_cid_table()
+
+    if en_t_list is not None:
+        if len(en_t_list) > 0:
+            for i_it in en_t_list:
+                del_asset_list.append(i_it[0])
 
     for i_id in del_asset_list:
         if i_id not in asset_id_list:

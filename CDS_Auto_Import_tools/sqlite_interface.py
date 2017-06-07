@@ -112,6 +112,17 @@ def get_cid_query_result(input_cid):
 
 
 @db_session
+def get_all_asset_id_from_cid_table():
+    try:
+        en_tuple_list = select((p.asset_id, p.media_cid) for p in CidTable)[:]
+        commit()
+        return en_tuple_list
+    except:
+        r_log.error('query all assetid from CidTable in CidTable failed, reason <{}>'.format(traceback.format_exc()))
+        return None
+
+
+@db_session
 def insert_cid_cid_table(input_cid, input_asset_id):
     try:
         CidTable(asset_id=input_asset_id, media_cid=input_cid)
