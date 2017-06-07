@@ -122,6 +122,9 @@ if __name__ == '__main__':
                                 else:
                                     sq_dict['transfer_content_ret_code'] = s_code
                                     sq_dict['status'] = -1
+                                    failed_asset_id = int(new_cid_set_d) - 100000
+                                    sqlite_interface.delete_entity_from_cid_table(failed_asset_id)
+                                    sqlite_interface.insert_one_deleted_asset_id(failed_asset_id)
                                     r_log.error(
                                         'inject action {} failed, code <{}>---->{}'.format(i_cid, s_code, str_xml_str))
                                 print(o_xml_str)
