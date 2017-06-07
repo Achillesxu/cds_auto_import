@@ -83,7 +83,7 @@ if __name__ == '__main__':
 
                         new_cid_set_d = sqlite_interface.get_cid_query_result(media_cid_serial)
                         if new_cid_set_d:
-                            time.sleep(1)
+                            # time.sleep(1)
                             sq_dict['media_type'] = v
                             sq_dict['media_id'] = k
                             sq_dict['sub_url'] = i_d['url']
