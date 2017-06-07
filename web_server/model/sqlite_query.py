@@ -26,16 +26,33 @@ class SqliteQuery(object):
     """
     sqlite query agent
     """
+    @staticmethod
+    def trans_transfer_status_to_percent(tuple_one):
+        xml_bytes = tuple_one[6].encode(encoding='utf-8')
+        xml_dict = xml_parser.XmlParser.parse_string(xml_bytes)
+        percent_list = []
+        for k, v in xml_dict.items():
+            if 'Output_' in k:
+                pp_str = v.get('percentComplete', '')
+                percent_list.append(str(pp_str))
+
+        percent_str = '-'.join(percent_list)
+
+        return (tuple_one[0], tuple_one[1], tuple_one[2], tuple_one[3], tuple_one[4], tuple_one[5], percent_str,
+                tuple_one[7], tuple_one[8])
 
     @staticmethod
     def query_res_table_count(current_page, page_limit=100):
         total_num = sqlite_interface.get_res_table_count()
+        record_list = []
         if total_num is not None and total_num > 0:
             index_from = (current_page - 1) * page_limit
             total_page = int(math.ceil(float(total_num) / page_limit))
             tmp_record_list = sqlite_interface.get_res_table_record_list(index_from, page_limit)
             if tmp_record_list is not None:
-                record_list = tmp_record_list
+                for i_t in tmp_record_list:
+                    new_tuple = SqliteQuery.trans_transfer_status_to_percent(i_t)
+                    record_list.append(new_tuple)
             else:
                 record_list = []
         else:
@@ -85,4 +102,5 @@ class SqliteQuery(object):
 
 if __name__ == '__main__':
     # print(SqliteQuery.query_url_from_res_table_id('100'))
-    pass
+    print(SqliteQuery.query_res_table_count(1, page_limit=2))
+
