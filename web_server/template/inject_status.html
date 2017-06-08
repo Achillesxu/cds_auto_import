@@ -51,7 +51,7 @@
     <?py page_list = []
     show_page_num = 10
     if total_page > show_page_num:
-    from_page = current_page - show_page_num/2
+    from_page = int(current_page - show_page_num/2)
     if from_page<1:
     from_page = 1
     #endif

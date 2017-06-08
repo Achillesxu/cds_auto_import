@@ -59,6 +59,7 @@ def loop_check_inject_insert_mysql():
                 if st_dict:
                     try:
                         asset_id = st_dict['root']['assetID']
+                        provider_id = st_dict['root']['providerID']
                         percent_list = list()
                         state_list = list()
                         fail_sign = False
