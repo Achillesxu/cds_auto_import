@@ -60,6 +60,10 @@ def loop_check_inject_insert_mysql():
                     try:
                         asset_id = st_dict['root']['assetID']
                         provider_id = st_dict['root']['providerID']
+                        if provider_id in pj_dict['provider_bak'].keys():
+                            # transfer asset_id to real value in ResTable---sub_cdn_id
+                            asset_id = str(int(asset_id) + int(pj_dict['provider_bak'][provider_id]))
+
                         percent_list = list()
                         state_list = list()
                         fail_sign = False
@@ -73,10 +77,10 @@ def loop_check_inject_insert_mysql():
                                     state_list.append(1 if str(v['state']) == 'Complete' else 0)
                         if fail_sign is True:
                             g_status = -1
-                            data_ret = sqlite_interface.delete_data_from_cdn_id(asset_id)
-                            sqlite_interface.delete_entity_from_cid_table(int(asset_id) - 100000)
-                            sqlite_interface.insert_one_deleted_asset_id(int(asset_id) - 100000)
-                            if data_ret is None and g_status == -1:
+                            data_ret1 = sqlite_interface.delete_data_from_cdn_id(asset_id)
+                            data_ret2 = sqlite_interface.delete_entity_from_cid_table(int(asset_id) - 100000)
+                            data_ret3 = sqlite_interface.insert_one_deleted_asset_id(int(asset_id) - 100000)
+                            if (data_ret1 is None or data_ret2 is None or data_ret3 is None) and g_status == -1:
                                 log_root.error('asset_id={}, g_status={}, post data = {}, database delete failed'.
                                                format(asset_id, g_status, ret_xml))
                         elif all(percent_list) and all(state_list):

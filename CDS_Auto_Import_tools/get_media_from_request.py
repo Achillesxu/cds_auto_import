@@ -158,6 +158,25 @@ class RequestEpg(object):
                           format(d_total_count, len(urls_list), detail_url))
         return urls_list
 
+    @staticmethod
+    def get_right_assetid_and_providerid(in_asset_id):
+
+        if 100001 <= int(in_asset_id) <= 200000:
+            g_pro_id = pj_dict['provider']
+            g_asset_id = in_asset_id
+        else:
+            as_front = int(in_asset_id[:-5])
+            as_back = int(in_asset_id[-5:])
+            if as_back > 0:
+                pick_int = as_front - 2 + 1
+            else:
+                pick_int = as_front - 2
+            g_pro_id = list(pj_dict['provider_bak'].keys())[list(pj_dict['provider_bak'].values()
+                                                                 ).index(pick_int * 100000)]
+
+            g_asset_id = str(int(in_asset_id) - pick_int * 100000)
+        return g_pro_id, g_asset_id
+
     def yield_xml_string(self, m_dict, i_cid_rep):
         """
         请求m3u8文件，解析地址，生成xml字符串, 格式为bytes
@@ -182,8 +201,10 @@ class RequestEpg(object):
         asset_id = i_cid_rep
         res_d_list = RequestEpg.parse_m3u8_file(m3u8_str)
         if res_d_list:
-            r_dict = OrderedDict([('providerID', pj_dict['provider']),
-                                  ('assetID', asset_id),
+            n_pro_id, n_asset_id = RequestEpg.get_right_assetid_and_providerid(asset_id)
+
+            r_dict = OrderedDict([('providerID', n_pro_id),
+                                  ('assetID', n_asset_id),
                                   ('transferBitRate', str(pj_dict['transfer_bit_rate'])),
                                   ('volumeName', pj_dict['volumeName']),
                                   ('responseURL',
@@ -262,64 +283,14 @@ class RequestEpg(object):
 
 
 if __name__ == '__main__':
-    rr = RequestEpg()
-    # sq_dict = dict()
-    # rr.check_media_list_len()
-    # while rr.set_next_media_type():
-    #     sq_dict['media_type'] = int(rr.epg_cur_media_type)
-    #     one_m_list = rr.get_media_list()
-    #     print(rr.epg_cur_media_type)
-    #     if len(one_m_list) > 0:
-    #         for i_m in one_m_list:
-    #             sq_dict['media_id'] = i_m
-    #             print(i_m)
-    #             m_urls_dict_list = rr.get_media_detail_info(i_m)
-    #             if len(m_urls_dict_list) > 0:
-    #                 for i_d_u in m_urls_dict_list:
-    #                     i_cid = i_d_u['url'].split('?cid=')[1]
-    #                     get_sq_dict = sqlite_interface.get_data_from_url_cid(i_cid)
-    #                     if get_sq_dict:
-    #                         continue
-    #                     print(i_d_u)
-    #                     mysql_dict = {'media_id': sq_dict['media_id'],
-    #                                   'url': i_d_u['url'],
-    #                                   'type': 0,
-    #                                   'serial': int(i_d_u['serial']),
-    #                                   'isfinal': 1 if i_d_u['isfinal'] else 0,
-    #                                   'provider_id': 100,
-    #                                   'quality_id': int(i_d_u['quality']),
-    #                                   'thumbnail_url': i_d_u['thumbnail'],
-    #                                   'image_url': i_d_u['image'],
-    #                                   'title': i_d_u['title'],
-    #                                   'description': i_d_u['description']
-    #                                   }
-    #                     sq_dict['sub_url'] = i_d_u['url']
-    #                     sq_dict['sub_cid'] = i_cid
-    #                     sq_dict['sub_cdn_id'] = RequestEpg.get_asset_id_from_cid(i_cid)
-    #                     sq_dict['mysql_url_record'] = json.dumps(mysql_dict)
-    #                     o_xml_str = rr.yield_xml_string(i_d_u)
-    #                     if o_xml_str:
-    #                         sq_dict['req_xml_str'] = o_xml_str.decode()
-    #
-    #                         sq_dict['transfer_content_ret_code'] = 200
-    #                         sq_dict['status'] = 1
-    #                     sqlite_interface.insert_data_to_database(sq_dict)
-    #                     print(o_xml_str, '\n')
+    test_list = []
+    for i in range(0, 1000):
+        test_list.append(random.randint(600001, 700000))
 
-                        # http_str = 'http://10.255.46.99:5002/Fbd509021e58875fc12bd7544c14dfa30.m3u8?token=1494838468_578&amp;gid=Z67610c561135d137acfcf446529d58fe&amp;channel=tianhua'
-                        # if pj_dict.get('play_token', ''):
-                        #     replace_token = pj_dict.get('play_token', '')
-                        #     re_patt = re.compile(r'(?<=token=)\w+(?=&amp;)')
-                        #     res__str = re.sub(re_patt, replace_token, http_str)
-                        #     print(res__str)
+    for i in test_list:
+        s_asset_id = str(i)
+        pro_id, new_asset_id = RequestEpg.get_right_assetid_and_providerid(asset_id)
+        print('{}-yield new number-{} in provider_id -<{}>'.format(asset_id, new_asset_id, pro_id))
+    print(RequestEpg.get_right_assetid_and_providerid('200001'))
+    print(RequestEpg.get_right_assetid_and_providerid('300000'))
 
-
-# m3u8_str = """#EXTM3U
-# #EXT-X-VERSION:4
-# #EXT-X-STREAM-INF:BANDWIDTH=1479725
-# http://118.190.2.29:5002/Fd83ed79794669a363c0fc280f5b4c6f6.m3u8?token=1494398323_281&gid=Zdbaa1647e5be64933a51fe60b842e8ac&channel=mcloud
-# #EXT-X-STREAM-INF:BANDWIDTH=1479758
-# http://118.190.2.29:5002/Fa8702243e99aad5705a2d195c4f0f5ed.m3u8?token=1494398323_281&gid=Zdbaa1647e5be64933a51fe60b842e8ac&channel=mcloud
-# #EXT-X-STREAM-INF:BANDWIDTH=1479998
-# http://118.190.2.29:5002/Fd13ba96861ec7b269addd51b7904df99.m3u8?token=1494398323_281&gid=Zdbaa1647e5be64933a51fe60b842e8ac&channel=mcloud"""
-#     RequestEpg.parse_m3u8_file(m3u8_str)

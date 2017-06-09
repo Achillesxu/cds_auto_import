@@ -18,6 +18,13 @@
     "num": 1
   },
   "provider": "123",
+  "provider_bak": {
+    "234": 100000,
+    "345": 200000,
+    "456": 300000,
+    "567": 400000,
+    "678": 500000
+  },
   "volumeName": "volumeA",
   "play_token": "meixun",
   "transfer_bit_rate": 20000000,
