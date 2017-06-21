@@ -16,7 +16,7 @@ from collections import OrderedDict
 from hashlib import md5
 
 from CDS_Auto_Import_tools import parameters_parse, xml_writer
-from CDS_Auto_Import_tools import sqlite_interface
+# from CDS_Auto_Import_tools import sqlite_interface
 
 r_log = logging.getLogger(parameters_parse.MY_LOG_NAME)
 
@@ -187,7 +187,9 @@ class RequestEpg(object):
         req_url = m_dict.get('url', '')
         if req_url:
             try:
-                ret_v = self.s.get(req_url, headers=q_headers, stream=True)
+                # replace ip to 10.255.46.99
+                new_url = RequestEpg.replace_http_url_ip_to_ip_in_parameters(req_url)
+                ret_v = self.s.get(new_url, headers=q_headers, stream=True)
                 if ret_v.status_code == 200:
                     m3u8_str = ret_v.text
                 else:
@@ -197,6 +199,9 @@ class RequestEpg(object):
             except:
                 r_log.error('request <{}> failed, please check, reason: <{}>'.format(req_url, traceback.format_exc()))
                 sys.exit()
+        else:
+            r_log.error('cant find url in media url, please check media url!!!!')
+            return None, None
 
         asset_id = i_cid_rep
         res_d_list = RequestEpg.parse_m3u8_file(m3u8_str)
@@ -236,6 +241,13 @@ class RequestEpg(object):
             return None, None
 
     @staticmethod
+    def replace_http_url_ip_to_ip_in_parameters(in_http_url):
+        re_patt = re.compile(r'(?<=http://)\d+\.\d+\.\d+\.\d+(?=:\d+/)')
+        replace_ip = pj_dict['epg_addr']['ip']
+        ret_url = re.sub(re_patt, replace_ip, in_http_url)
+        return ret_url
+
+    @staticmethod
     def parse_m3u8_file(i_m3u8_str):
         """
         切分m3u8字符串, 返回词典列表
@@ -253,7 +265,9 @@ class RequestEpg(object):
                         replace_token = pj_dict.get('play_token', '')
                         re_patt = re.compile(r'(?<=token=)\w+(?=&)')
                         res__str = re.sub(re_patt, replace_token, r_l[1])
-                    res_d_list.append(OrderedDict([('subID', str(int(int(r_l[0]) / 1024))), ('sourceURL', res__str)]))
+                        # replace ip to 10.255.46.99
+                        new_url = RequestEpg.replace_http_url_ip_to_ip_in_parameters(res__str)
+                        res_d_list.append(OrderedDict([('subID', str(int(int(r_l[0]) / 1024))), ('sourceURL', new_url)]))
                     # print({'subID': r_l[0], 'sourceURL': r_l[1]})
             if len(res_d_list) == 0:
                 return None
@@ -284,13 +298,17 @@ class RequestEpg(object):
 
 if __name__ == '__main__':
     test_list = []
-    for i in range(0, 1000):
-        test_list.append(random.randint(600001, 700000))
+    # for i in range(0, 1000):
+    #     test_list.append(random.randint(600001, 700000))
+    #
+    # for i in test_list:
+    #     s_asset_id = str(i)
+    #     pro_id, new_asset_id = RequestEpg.get_right_assetid_and_providerid(s_asset_id)
+    #     print('{}-yield new number-{} in provider_id -<{}>'.format(s_asset_id, new_asset_id, pro_id))
+    # print(RequestEpg.get_right_assetid_and_providerid('200001'))
+    # print(RequestEpg.get_right_assetid_and_providerid('300000'))
+    #
 
-    for i in test_list:
-        s_asset_id = str(i)
-        pro_id, new_asset_id = RequestEpg.get_right_assetid_and_providerid(asset_id)
-        print('{}-yield new number-{} in provider_id -<{}>'.format(asset_id, new_asset_id, pro_id))
-    print(RequestEpg.get_right_assetid_and_providerid('200001'))
-    print(RequestEpg.get_right_assetid_and_providerid('300000'))
-
+    test_url = 'http://10.2.12.111:5002/Fee9f18b7451be784de48a7b1955c985b.m3u8?token=meixun&amp;gid=Z2f63403cd7646f3239d72e75c33ef625&amp;channel=tianhua'
+    new_http_url = RequestEpg.replace_http_url_ip_to_ip_in_parameters(test_url)
+    print(new_http_url)
