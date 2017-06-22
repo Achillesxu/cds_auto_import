@@ -90,7 +90,7 @@ class InjectStatusHomePage(BaseHandler):
         response_tup = yield [http_cli.fetch(i) for i in detail_url_list]
         title_id_list = [(json.loads(i.body.decode(encoding='utf-8')).get('title', ''),
                           json.loads(i.body.decode(encoding='utf-8')).get('id', '')) for i in response_tup]
-        for ri, ti in zip(records_info['record_list'], title_id_list):
+        for ri, ti in zip(records_info['records'], title_id_list):
             if ri[1] == ti[1]:
                 i_item = (*ri, ti[0])
             else:
