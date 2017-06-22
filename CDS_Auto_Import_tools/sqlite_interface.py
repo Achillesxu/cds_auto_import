@@ -264,7 +264,7 @@ def get_res_table_count():
 def get_res_table_record_list(start_id, limit_num):
     try:
         ent_tuple_list = select((p.id, p.media_id, p.sub_cid, p.sub_cdn_id, p.mysql_url_record, p.status,
-                                 p.transfer_status, p.is_mysql_insert, p.req_xml_str) for p in ResTable
+                                 p.transfer_status, p.is_mysql_insert, p.req_xml_str, p.media_type) for p in ResTable
                                 if p.id >= int(start_id))[:int(limit_num)]
         commit()
         return ent_tuple_list

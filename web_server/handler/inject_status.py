@@ -13,13 +13,30 @@
 """
 
 import os
+import sys
+import logging
 import json
 import tenjin
 from tenjin.html import *
 from tenjin.helpers import *
 import tornado.web
+import tornado.gen
+from tornado.httpclient import AsyncHTTPClient
 
 from web_server.model import sqlite_query
+
+from CDS_Auto_Import_tools import parameters_parse
+
+root_myapp = logging.getLogger('web_server')
+
+pj_dict = parameters_parse.get_para_dict()
+
+if pj_dict is None:
+    root_myapp.error('get parameters error, please check log file and parameters_parse.py')
+    sys.exit()
+
+EPG_MEDIA_INFO_URL = \
+    'http://{ip}:{port}/epgs/{template}/media/detail?&columnid={columnid}&id={m_id}'
 
 engine = tenjin.Engine(
     path=[os.path.join('web_server', 'template'), ],
@@ -52,6 +69,7 @@ class InjectStatusHomePage(BaseHandler):
     show inject status home page
     """
 
+    @tornado.gen.coroutine
     def get(self):
         page = self.get_argument('page', '1')
         try:
@@ -60,12 +78,30 @@ class InjectStatusHomePage(BaseHandler):
             page = 1
         title = 'inject_status'
         records_info = sqlite_query.SqliteQuery.query_res_table_count(page, 100)
+
+        o_rec_tup_list = []
+        http_cli = AsyncHTTPClient()
+        i_epg_ip = pj_dict['epg_addr']['ip']
+        i_epg_port = pj_dict['epg_addr']['port']
+        i_epg_template = pj_dict['epg_template']
+
+        detail_url_list = [EPG_MEDIA_INFO_URL.format(ip=i_epg_ip, port=i_epg_port, template=i_epg_template,
+                                                     columnid=i[9], m_id=i[1]) for i in records_info['records']]
+        response_tup = yield [http_cli.fetch(i) for i in detail_url_list]
+        title_id_list = [(json.loads(i.body).get('title', ''), json.loads(i.body).get('id', ''))for i in response_tup]
+        for ri, ti in zip(records_info['record_list'], title_id_list):
+            if ri[1] == ti[1]:
+                i_item = (*ri, ti[0])
+            else:
+                i_item = (*ri, '')
+            o_rec_tup_list.append(i_item)
+
         self.echo('inject_status.html', {
             'title': title,
             'current_page': page,
             'total_page': records_info['total_page'],
             'total_num': records_info['total_num'],
-            'record_list': records_info['records'],
+            'record_list': o_rec_tup_list,
         }, layout='_layout_.html')
 
 

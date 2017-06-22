@@ -40,10 +40,10 @@ class SqliteQuery(object):
             percent_str = '-'.join(percent_list)
 
             return (tuple_one[0], tuple_one[1], tuple_one[2], tuple_one[3], tuple_one[4], tuple_one[5], percent_str,
-                    tuple_one[7], tuple_one[8])
+                    tuple_one[7], tuple_one[8], tuple_one[9])
         else:
             return (tuple_one[0], tuple_one[1], tuple_one[2], tuple_one[3], tuple_one[4], tuple_one[5], 'None',
-                    tuple_one[7], tuple_one[8])
+                    tuple_one[7], tuple_one[8], tuple_one[9])
 
     @staticmethod
     def query_res_table_count(current_page, page_limit=100):
