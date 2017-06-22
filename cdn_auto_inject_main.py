@@ -28,8 +28,11 @@ pj_dict = parameters_parse.get_para_dict()
 
 
 def get_json_str(input_str):
-    if len(input_str) > 0:
-        json_str = json.dumps({'zh': input_str, 'zh_hk': '', 'en': ''}, ensure_ascii=False)
+    if isinstance(input_str, str):
+        if len(input_str) > 0:
+            json_str = json.dumps({'zh': input_str, 'zh_hk': '', 'en': ''}, ensure_ascii=False)
+        else:
+            json_str = json.dumps({'zh': '', 'zh_hk': '', 'en': ''}, ensure_ascii=False)
     else:
         json_str = json.dumps({'zh': '', 'zh_hk': '', 'en': ''}, ensure_ascii=False)
     return json_str
