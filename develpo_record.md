@@ -16,3 +16,4 @@
 ## 2017-06-21
 1. 在注入状态页／inject_status页显示添加media_id相关的title，title获取，从对应的接口请求数据
 2. 修复description，NoneType错误
+3. httpresponse body 为bytes

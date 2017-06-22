@@ -88,7 +88,8 @@ class InjectStatusHomePage(BaseHandler):
         detail_url_list = [EPG_MEDIA_INFO_URL.format(ip=i_epg_ip, port=i_epg_port, template=i_epg_template,
                                                      columnid=i[9], m_id=i[1]) for i in records_info['records']]
         response_tup = yield [http_cli.fetch(i) for i in detail_url_list]
-        title_id_list = [(json.loads(i.body).get('title', ''), json.loads(i.body).get('id', ''))for i in response_tup]
+        title_id_list = [(json.loads(i.body.decode(encoding='utf-8')).get('title', ''),
+                          json.loads(i.body.decode(encoding='utf-8')).get('id', '')) for i in response_tup]
         for ri, ti in zip(records_info['record_list'], title_id_list):
             if ri[1] == ti[1]:
                 i_item = (*ri, ti[0])
