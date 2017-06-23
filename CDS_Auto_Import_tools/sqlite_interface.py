@@ -322,7 +322,7 @@ if __name__ == '__main__':
     # en_list = get_res_table_record_list(5, 100)
     # print(len(en_list), en_list[-1][0])
     # print(en_list[0])
-    ttt = get_res_table_record_list(10, 1)
+    ttt = get_res_table_record_list(104, 1)
     print(ttt[0][4])
     ddd = json.loads(ttt[0][4], strict=False)
     print(ddd)

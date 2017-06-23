@@ -70,25 +70,26 @@ class SqliteQuery(object):
     def query_url_from_res_table_id(input_id):
         tmp_record_list = sqlite_interface.get_res_table_record_list(input_id, 1)
         if len(tmp_record_list) == 1:
+            out_asset_id = tmp_record_list[0][3]
             out_url = tmp_record_list[0][4]
             out_st = tmp_record_list[0][5]
             out_insert = tmp_record_list[0][7]  # mysql url 是否插入，1 已经插入，0 未插入
             out_req_xml = tmp_record_list[0][8]
-            return out_url, out_st, out_insert, out_req_xml
+            return out_url, out_st, out_insert, out_req_xml, out_asset_id
         else:
             if len(tmp_record_list) > 1:
                 root_myapp.error('id in ResTable exist many'.format(input_id))
             elif len(tmp_record_list) == 0:
                 root_myapp.error('id in ResTable dont exist'.format(input_id))
-            return None, None, None, None
+            return None, None, None, None, None
 
     @staticmethod
     def delete_id_and_mysql_url(input_id):
         in_tuple = SqliteQuery.query_url_from_res_table_id(input_id)
         if in_tuple[0] is not None:
-            sqlite_interface.delete_data_from_cdn_id('{:06}'.format(int(input_id) + 100000))
-            sqlite_interface.delete_entity_from_cid_table(int(input_id))
-            sqlite_interface.insert_one_deleted_asset_id(int(input_id))
+            sqlite_interface.delete_data_from_cdn_id(in_tuple[4])
+            sqlite_interface.delete_entity_from_cid_table(int(in_tuple[4]) - 100000)
+            sqlite_interface.insert_one_deleted_asset_id(int(in_tuple[4]) - 100000)
             m_dict = json.loads(in_tuple[0], strict=False)
             status_bytes = xml_parser.XmlParser.get_query_str(in_tuple[3].encode(encoding='utf-8'),
                                                               'DeleteContent', 201)
