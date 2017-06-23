@@ -87,22 +87,21 @@ class SqliteQuery(object):
     def delete_id_and_mysql_url(input_id):
         in_tuple = SqliteQuery.query_url_from_res_table_id(input_id)
         if in_tuple[0] is not None:
-            sqlite_interface.delete_data_from_cdn_id(in_tuple[4])
-            sqlite_interface.delete_entity_from_cid_table(int(in_tuple[4]) - 100000)
-            sqlite_interface.insert_one_deleted_asset_id(int(in_tuple[4]) - 100000)
             m_dict = json.loads(in_tuple[0], strict=False)
             status_bytes = xml_parser.XmlParser.get_query_str(in_tuple[3].encode(encoding='utf-8'),
                                                               'DeleteContent', 201)
-            # print(status_bytes)
-            if in_tuple[2] == 1:
-                mysql_interface.mysql_delete_url(m_dict['url'])
-                request_shuma_cdn.RequestCDN.delete_content(status_bytes)
-            elif int(in_tuple[1]) == 3:
-                request_shuma_cdn.RequestCDN.delete_content(status_bytes)
-            elif int(in_tuple[1]) == 2:
-                request_shuma_cdn.RequestCDN.delete_content(status_bytes)
-            elif int(in_tuple[1]) == 1:
-                request_shuma_cdn.RequestCDN.delete_content(status_bytes)
+            ret_status = request_shuma_cdn.RequestCDN.delete_content(status_bytes)
+            if ret_status is not None and ret_status == 200:
+                del_access = True
+            else:
+                del_access = False
+            if del_access:
+                if in_tuple[2] == 1:
+                    mysql_interface.mysql_delete_url(m_dict['url'])
+
+                sqlite_interface.delete_data_from_cdn_id(in_tuple[4])
+                sqlite_interface.delete_entity_from_cid_table(int(in_tuple[4]) - 100000)
+                sqlite_interface.insert_one_deleted_asset_id(int(in_tuple[4]) - 100000)
 
 
 if __name__ == '__main__':
