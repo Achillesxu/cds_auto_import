@@ -33,3 +33,7 @@
 #page_list .hidden {
     display: none;
 }
+
+.search_con li {margin-bottom:20px;line-height:120%;}
+.search_con li img {margin-right:10px;width:100px;height:150px;}
+#source_list input {width: 60%;}

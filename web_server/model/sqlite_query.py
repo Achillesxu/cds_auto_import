@@ -103,6 +103,17 @@ class SqliteQuery(object):
                 sqlite_interface.delete_entity_from_cid_table(int(in_tuple[4]) - 100000)
                 sqlite_interface.insert_one_deleted_asset_id(int(in_tuple[4]) - 100000)
 
+    @staticmethod
+    def query_media_id_in_res_table(in_media_id):
+        res_dict = sqlite_interface.query_media_id_in_res_table(in_media_id)
+        if res_dict is not None:
+            if res_dict['media_id']:
+                return res_dict
+            else:
+                return None
+        else:
+            return None
+
 
 if __name__ == '__main__':
     # print(SqliteQuery.query_url_from_res_table_id('100'))

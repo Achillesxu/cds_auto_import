@@ -47,6 +47,7 @@ class Application(tornado.web.Application):
         # import handler
         from web_server.handler import transfer_status
         from web_server.handler import inject_status
+        from web_server.handler import media_search
 
         settings = dict(
             static_path=os.path.join(os.path.dirname(__file__), "web_server/static"),
@@ -58,6 +59,8 @@ class Application(tornado.web.Application):
             (r'/static/(.*)', tornado.web.StaticFileHandler, {'path': settings['static_path']}),
             (r'/inject_status', inject_status.InjectStatusHomePage),  # homepage entrance
             (r'/delete_record', inject_status.DeleteInjectRecord),
+            (r'/data_search', media_search.DatabaseSearch),
+            (r'/media_search', media_search.MediaSearch),
             (r'/TransferStatus', transfer_status.TransferStatus)
         ]
 

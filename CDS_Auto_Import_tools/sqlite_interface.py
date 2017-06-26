@@ -273,6 +273,20 @@ def get_res_table_record_list(start_id, limit_num):
         return None
 
 
+@db_session
+def query_media_id_in_res_table(in_media_id):
+    try:
+        ent_tuple_list = select((p.media_type, p.media_id) for p in ResTable if p.media_id == in_media_id)[:]
+        commit()
+        if len(ent_tuple_list) > 0:
+            return {'media_type': ent_tuple_list[0][0], 'media_id': ent_tuple_list[0][1]}
+        else:
+            return {'media_type': 0, 'media_id': ''}
+    except:
+        r_log.error('query media id <{}> in ResTable failed, reason <{}>'.format(in_media_id, traceback.format_exc()))
+        return None
+
+
 if __name__ == '__main__':
     # i_input_dict = {
     #     'media_type': 1, 'media_id': 'BE2C3790D0B80A7DDA6906CA65C1B73F',
@@ -322,7 +336,9 @@ if __name__ == '__main__':
     # en_list = get_res_table_record_list(5, 100)
     # print(len(en_list), en_list[-1][0])
     # print(en_list[0])
-    ttt = get_res_table_record_list(104, 1)
-    print(ttt[0][4])
-    ddd = json.loads(ttt[0][4], strict=False)
-    print(ddd)
+    # ttt = get_res_table_record_list(104, 1)
+    # print(ttt[0][4])
+    # ddd = json.loads(ttt[0][4], strict=False)
+    # print(ddd)
+    res_dict = query_media_id_in_res_table('1BBE91802CC568A3B3752CE24475BB80')
+    print(res_dict)

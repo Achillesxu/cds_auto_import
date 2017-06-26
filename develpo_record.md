@@ -19,3 +19,6 @@
 3. httpresponse body 为bytes
 4. 修复inject_status接口内纪录无法删除的bug
 5. 调整删除的流程，只有删除了数码的cdn后才删除本地的数据库，否者不删除
+
+## 2017-06-26
+1. 添加搜索页面
