@@ -18,12 +18,10 @@ db = Database()
 class Media(db.Entity):
     id = PrimaryKey(str, 36)  # primary key
     meta_id = Optional(int, size=8, default=0, index=True)  # index
-    channel = Optional(str, 32, default='root', index=True)  # index
+    sp = Optional(str, 32, default='', index='channel')  # index
     drm = Optional(int, size=8, default=0)
     type_id = Optional(int, size=8, default=0, index=True)  # index
-    byte_len = Optional(int, size=64, default=0)
     time_len = Optional(int, size=32, default=0)
-    bitrate = Optional(int, size=32, default=0)
     create_utc = Required(int, size=64)  # not null
     modify_utc = Required(int, size=64)  # not null
     pub_utc = Optional(int, size=64, default=0)
@@ -64,6 +62,9 @@ class Media(db.Entity):
     screenwriter = Optional(str, 1024, default='')
     description = Optional(LongStr)  # text
     dialogue = Optional(str, 1024, default='')
+    serial_err_status = Optional(int, size=8, default=0)
+    bitrate_err_status = Optional(int, size=8, default=0)
+    cp = Optional(str, 32, default='')
     url = Set('Url', reverse='media_id', cascade_delete=True)
 
 
@@ -71,7 +72,6 @@ class Url(db.Entity):
     idx = PrimaryKey(int, auto=True)  # primary key
     media_id = Required(Media, index='media_id', reverse='url')  # index
     url = Required(str, 2048)
-    type = Optional(int, size=8, default=0)
     serial = Optional(int, size=64, default=0)
     isfinal = Optional(int, size=8, default=1)
     provider_id = Optional(int, size=32, default=100)
@@ -80,6 +80,8 @@ class Url(db.Entity):
     image_url = Optional(str, 255)
     title = Optional(str, 255, default='')
     description = Optional(str, 4096, default='')
+    time_len = Optional(int, size=16, default=0)
+    bitrate = Optional(str, 64, default='')
 
 
 if parameters_parse.get_para_dict() is None:
@@ -161,7 +163,6 @@ if __name__ == '__main__':
 
     v_dict1 = {'media_id': '08E2927DC4A1C344B2F275D53D67C900',
                'url': 'http://1:1/vod/meixun_123.m3u8',
-               'type': 0,
                'serial': int(1),
                'isfinal': 1,
                'provider_id': 200,
