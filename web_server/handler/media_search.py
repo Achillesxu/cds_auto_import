@@ -48,12 +48,13 @@ class MediaSearch(BaseHandler):
             'title': title,
         }, layout='_layout_search.html')
 
+    @tornado.gen.coroutine
     def post(self):
         # in_title = self.get_argument('title', '')
 
         act = self.get_argument('act', '')
         if act == 'search':
-            as_http_client = HTTPClient()
+            as_http_client = AsyncHTTPClient()
             in_media_id = self.get_argument('kw', '')
             if not in_media_id:
                 self.write('{"error_code": 0, "name": "media_id must not be empty"}')
@@ -61,8 +62,8 @@ class MediaSearch(BaseHandler):
             self.set_header('Content-Type', 'application/json;charset=UTF-8')
             if len(in_media_id) == 32:
                 detail_url_list = 'http://{ip}:{port}/data_search?media_id={media_id}'.\
-                    format(ip=pj_dict['status_addr']['ip'], port=pj_dict['status_addr']['port'], media_id=in_media_id)
-                ret_response = as_http_client.fetch(detail_url_list)
+                    format(ip='127.0.0.1', port=pj_dict['status_addr']['port'], media_id=in_media_id)
+                ret_response = yield as_http_client.fetch(detail_url_list)
                 res_dict = json.loads(ret_response.body.decode(encoding='utf-8'))
                 self.write(json.dumps(res_dict))
             else:
@@ -73,7 +74,7 @@ class DatabaseSearch(tornado.web.RequestHandler):
     @tornado.gen.coroutine
     def get(self):
         in_media_id = self.get_argument('media_id', '')
-        as_http_client = AsyncHTTPClient()
+        as_http_client1 = AsyncHTTPClient()
         i_epg_ip = pj_dict['epg_addr']['ip']
         i_epg_port = pj_dict['epg_addr']['port']
         i_epg_template = pj_dict['epg_template']
@@ -81,10 +82,10 @@ class DatabaseSearch(tornado.web.RequestHandler):
         self.set_header('Content-Type', 'application/json;charset=UTF-8')
         res_dict = SqliteQuery.query_media_id_in_res_table(in_media_id)
         if res_dict is not None:
-            detail_url_list = EPG_MEDIA_INFO_URL.format(ip=i_epg_ip, port=i_epg_port, template=i_epg_template,
-                                                        columnid=res_dict['media_type'], m_id=res_dict['media_id'])
+            detail_url = EPG_MEDIA_INFO_URL.format(ip=i_epg_ip, port=i_epg_port, template=i_epg_template,
+                                                   columnid=res_dict['media_type'], m_id=res_dict['media_id'])
             try:
-                ret_response = yield as_http_client.fetch(detail_url_list)
+                ret_response = yield as_http_client1.fetch(detail_url)
                 if ret_response.code == 200:
                     ret_dict = json.loads(ret_response.body.decode(encoding='utf-8'))
                     if res_dict['media_id'] == ret_dict.get('id', ''):
