@@ -5,6 +5,7 @@ desc：mysql写入接口
 time：2017-05-10
 author: achilles_xushy
 """
+import sys
 import logging
 import traceback
 from pony.orm import *
