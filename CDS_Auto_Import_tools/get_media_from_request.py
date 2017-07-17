@@ -188,7 +188,8 @@ class RequestEpg(object):
         if req_url:
             try:
                 # replace ip to 10.255.46.99
-                new_url = RequestEpg.replace_http_url_ip_to_ip_in_parameters(req_url)
+                epg_ip = pj_dict['epg_addr']['ip']
+                new_url = RequestEpg.replace_http_url_ip_to_ip_in_parameters(req_url, epg_ip)
                 ret_v = self.s.get(new_url, headers=q_headers, stream=True)
                 if ret_v.status_code == 200:
                     m3u8_str = ret_v.text
@@ -241,9 +242,9 @@ class RequestEpg(object):
             return None, None
 
     @staticmethod
-    def replace_http_url_ip_to_ip_in_parameters(in_http_url):
+    def replace_http_url_ip_to_ip_in_parameters(in_http_url, in_replace_ip):
         re_patt = re.compile(r'(?<=http://)\d+\.\d+\.\d+\.\d+(?=:\d+/)')
-        replace_ip = pj_dict['epg_addr']['ip']
+        replace_ip = in_replace_ip
         ret_url = re.sub(re_patt, replace_ip, in_http_url)
         return ret_url
 
@@ -266,7 +267,8 @@ class RequestEpg(object):
                         re_patt = re.compile(r'(?<=token=)\w+(?=&)')
                         res__str = re.sub(re_patt, replace_token, r_l[1])
                         # replace ip to 10.255.46.99
-                        new_url = RequestEpg.replace_http_url_ip_to_ip_in_parameters(res__str)
+                        cdn_ip = pj_dict['epg_cdn']['ip']
+                        new_url = RequestEpg.replace_http_url_ip_to_ip_in_parameters(res__str, cdn_ip)
                         res_d_list.append(OrderedDict([('subID', str(int(int(r_l[0]) / 1024))), ('sourceURL', new_url)]))
                     # print({'subID': r_l[0], 'sourceURL': r_l[1]})
             if len(res_d_list) == 0:
