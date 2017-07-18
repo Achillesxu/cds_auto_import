@@ -52,7 +52,7 @@ class SqliteQuery(object):
         if total_num is not None and total_num > 0:
             index_from = (current_page - 1) * page_limit
             total_page = int(math.ceil(float(total_num) / page_limit))
-            tmp_record_list = sqlite_interface.get_res_table_record_list(index_from, page_limit)
+            tmp_record_list = sqlite_interface.get_res_table_record_list_page(index_from, page_limit)
             if tmp_record_list is not None:
                 for i_t in tmp_record_list:
                     new_tuple = SqliteQuery.trans_transfer_status_to_percent(i_t)

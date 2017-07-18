@@ -274,6 +274,19 @@ def get_res_table_record_list(start_id, limit_num):
 
 
 @db_session
+def get_res_table_record_list_page(start_id, limit_num):
+    try:
+        ent_tuple_list = select((p.id, p.media_id, p.sub_cid, p.sub_cdn_id, p.mysql_url_record, p.status,
+                                 p.transfer_status, p.is_mysql_insert, p.req_xml_str, p.media_type) for p in
+                                ResTable).limit(int(limit_num), offset=int(start_id))
+        commit()
+        return ent_tuple_list
+    except:
+        r_log.error('get 100 record failed, reason <{}>'.format(traceback.format_exc()))
+        return None
+
+
+@db_session
 def query_media_id_in_res_table(in_media_id):
     try:
         ent_tuple_list = select((p.media_type, p.media_id) for p in ResTable if p.media_id == in_media_id)[:]
@@ -340,5 +353,13 @@ if __name__ == '__main__':
     # print(ttt[0][4])
     # ddd = json.loads(ttt[0][4], strict=False)
     # print(ddd)
-    res_dict = query_media_id_in_res_table('1BBE91802CC568A3B3752CE24475BB80')
-    print(res_dict)
+    # res_dict = query_media_id_in_res_table('1BBE91802CC568A3B3752CE24475BB80')
+    # print(res_dict)
+    q_list = get_res_table_record_list_page(5200, 100)
+    if q_list:
+        print(len(q_list))
+        print(q_list[0][3])
+        print(q_list[-1][3])
+    else:
+        print('nothing')
+

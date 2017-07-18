@@ -27,3 +27,6 @@
 ## 2017-07-17
 1. parameters.json添加我方cdn地址配置项
 2. 修改m3u8文件内的播放地址的ip，替换成epg_cdn-ip
+
+## 2017-07-18
+1. 修改inject_status页面现实错误的问题
