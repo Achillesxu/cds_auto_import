@@ -300,6 +300,22 @@ def query_media_id_in_res_table(in_media_id):
         return None
 
 
+@db_session
+def query_injected_info_in_mysql():
+    """
+    get record inserted into mysql
+    :return: tuple list
+    """
+    try:
+        en_t_list = select((p.id, p.mysql_url_record, p.is_mysql_insert)
+                           for p in ResTable if p.is_mysql_insert == 1)[:]
+        commit()
+        return en_t_list
+    except:
+        r_log.error('query record that is_mysql_insert == 1 in ResTable failed, reason <{}>'.
+                    format(traceback.format_exc()))
+        return None
+
 if __name__ == '__main__':
     # i_input_dict = {
     #     'media_type': 1, 'media_id': 'BE2C3790D0B80A7DDA6906CA65C1B73F',

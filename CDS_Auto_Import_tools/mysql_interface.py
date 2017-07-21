@@ -151,6 +151,18 @@ def mysql_delete_url(in_url):
         return None
 
 
+@db_session
+def query_shuma_record():
+    try:
+        en_t_list = select((p.idx, p.url, p.provider_id) for p in Url if p.provider_id == 200)[:]
+        commit()
+        return en_t_list
+    except:
+        r_log.error('query record provider_id==200>> failed, error <{}>'.
+                    format(traceback.format_exc()))
+        return None
+
+
 if __name__ == '__main__':
     m_v_dict = {'id': '08E2927DC4A1C344B2F275D53D67C900',
                 'create_utc': 1234567890,
