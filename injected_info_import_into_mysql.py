@@ -51,7 +51,7 @@ def main_entrance():
     if diff_list:
         print('start insert record, please wait seconds!')
         for i in diff_list:
-            sq_url_dict[i]['media_id'] = '08E2927DC4A1C344B2F275D53D67C900'  # only for test
+            # sq_url_dict[i]['media_id'] = '08E2927DC4A1C344B2F275D53D67C900'  # only for test
             ret_v = mysql_interface.mysql_insert_url(sq_url_dict[i])
             if ret_v is None:
                 print('<{}> insert mysql failed or record already in url table, please check run_record.log'.
