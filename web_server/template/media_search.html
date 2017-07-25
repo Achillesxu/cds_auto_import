@@ -7,33 +7,70 @@
                 <div class="input-control text" data-role="input-control">
                     <input type="text" id="id_kw" name="name" value="" width="128">
                 </div>
-                <button type="submit" id="save_sc" class="button large">搜 索</button>
+                <button type="submit" id="search_sc" class="button large">搜 索</button>
             </fieldset>
         </div>
     </div>
     <div class="row">
         <h5>搜索结果如下：</h5>
         <ul id="search_con" class="search_con"></ul>
+        <table class="altrowstable" id="alternatecolor">
+        </table>
     </div>
 </div>
 
 <script>
-$("#save_sc").on('click', function(){
+$("#search_sc").on('click', function(){
     var kw = $('#id_kw').val();
     $.ajax({
         url: '/media_search',
         data: {'act': 'search','kw': kw},
         success: function(json) {
             //alert(json.error_code);
-            var name1 = json.name;
-            var search_con = $("#search_con");
+            //var name1 = json.name;
+            var search_con = $("#alternatecolor");
             search_con.html('');
-            var html = '<li>'+ name1 + '</li>';
-            search_con.append(html);
+            search_con.append('<tr>'+ '<td>delete</td><td>id</td><td>title</td><td>media_id</td><td>url</td><td>mysql_record</td><td>status</td><td>is_mysql_insert</td>' +'</tr>');
+            var data2 = eval(json);
+            if (data2 instanceof Array){
+                for(var i_item in data2){
+                    var dic = data2[i_item];
+                    var html_s = '<tr id="' + 'id_tr_' + dic.id + '">';
+//                    var html_1 = '<td>' + '<a href="/delete_search?rid=' + dic.id + '"' + ' title="delete this items from table" class="button info">delete</a>' + '</td>';
+                    var html_1 = '<td>' + '<a href="javascript:void(0)" onclick=' + '"remove_line(' + dic.id + ')"' +'>delete</a>' + '</td>';
+                    var html_2 = '<td>' + dic.id + '</td>';
+                    var html_3 = '<td>' + dic.name + '</td>';
+                    var html_4 = '<td>' + dic.media_id + '</td>';
+                    var html_5 = '<td>' + dic.url + '</td>';
+                    var html_7 = '<td>' + dic.mysql_r + '</td>';
+                    var html_8 = '<td>' + dic.status + '</td>';
+                    var html_9 = '<td>' + dic.is_in_mysql + '</td>';
+                    var html_e = '</tr>';
+                    var html_m = html_s + html_1 + html_2 + html_3 + html_4 + html_5 + html_7 + html_8 + html_9 + html_e;
+                    search_con.append(html_m);
+                }
+            }
+            else{
+                alert(json)
+            }
         },
         dataType: 'json',
         type: 'POST'
     });
 });
+
+function remove_line(in_id){
+    $('#id_tr_'+in_id).remove();
+    $.ajax({
+        url: '/delete_search',
+        data: {'rid': in_id},
+        success: function(res_str){
+            alert(res_str);
+        },
+        dataType: 'text',
+        type: 'GET'
+    });
+    return false;
+}
 
 </script>

@@ -301,6 +301,25 @@ def query_media_id_in_res_table(in_media_id):
 
 
 @db_session
+def query_media_id_in_res_table_all(in_media_id):
+    try:
+        ent_tuple_list = select((p.id, p.media_type, p.media_id, p.sub_url, p.req_xml_str, p.mysql_url_record, p.status,
+                                 p.is_mysql_insert) for p in ResTable if p.media_id == in_media_id)[:]
+        if ent_tuple_list:
+            return [{'id': p[0],
+                     'media_type': p[1],
+                     'media_id': p[2],
+                     'url': p[3], 'xml': p[4],
+                     'mysql_r': p[5], 'status': p[6],
+                     'is_in_mysql': p[7]} for p in ent_tuple_list]
+        else:
+            return []
+    except:
+        r_log.error('query media id <{}> in ResTable failed, reason <{}>'.format(in_media_id, traceback.format_exc()))
+        return None
+
+
+@db_session
 def query_injected_info_in_mysql():
     """
     get record inserted into mysql

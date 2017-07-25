@@ -61,6 +61,7 @@ class Application(tornado.web.Application):
             (r'/delete_record', inject_status.DeleteInjectRecord),
             (r'/data_search', media_search.DatabaseSearch),
             (r'/media_search', media_search.MediaSearch),
+            (r'/delete_search', media_search.SearchDelete),
             (r'/TransferStatus', transfer_status.TransferStatus)
         ]
 
@@ -97,7 +98,7 @@ def main():
         port = int(sys.argv[1])
     except:
         # port = 8888
-        port = 15001
+        port = 15010
 
     global server
 

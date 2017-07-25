@@ -64,8 +64,8 @@ class MediaSearch(BaseHandler):
                 detail_url_list = 'http://{ip}:{port}/data_search?media_id={media_id}'.\
                     format(ip='127.0.0.1', port=pj_dict['status_addr']['port'], media_id=in_media_id)
                 ret_response = yield as_http_client.fetch(detail_url_list)
-                res_dict = json.loads(ret_response.body.decode(encoding='utf-8'))
-                self.write(json.dumps(res_dict))
+                res_list = json.loads(ret_response.body.decode(encoding='utf-8'))
+                self.write(json.dumps(res_list))
             else:
                 self.write(json.dumps({'name': 'please check media_id len'}))
 
@@ -80,16 +80,20 @@ class DatabaseSearch(tornado.web.RequestHandler):
         i_epg_template = pj_dict['epg_template']
 
         self.set_header('Content-Type', 'application/json;charset=UTF-8')
-        res_dict = SqliteQuery.query_media_id_in_res_table(in_media_id)
-        if res_dict is not None:
+        res_list = SqliteQuery.query_media_id_in_res_table(in_media_id)
+        if res_list is not None:
             detail_url = EPG_MEDIA_INFO_URL.format(ip=i_epg_ip, port=i_epg_port, template=i_epg_template,
-                                                   columnid=res_dict['media_type'], m_id=res_dict['media_id'])
+                                                   columnid=res_list[0]['media_type'], m_id=res_list[0]['media_id'])
             try:
                 ret_response = yield as_http_client1.fetch(detail_url)
                 if ret_response.code == 200:
                     ret_dict = json.loads(ret_response.body.decode(encoding='utf-8'))
-                    if res_dict['media_id'] == ret_dict.get('id', ''):
-                        self.write(json.dumps({'name': ret_dict['title'], 'media_id': res_dict['media_id']}))
+                    if res_list[0]['media_id'] == ret_dict.get('id', ''):
+                        # self.write(json.dumps({'name': ret_dict['title'], 'media_id': res_dict['media_id']}))
+                        self.write(json.dumps([{'id': i_t['id'], 'name': 'test', 'media_id': i_t['media_id'],
+                                                'url': i_t['url'], 'xml': i_t['xml'], 'mysql_r': i_t['mysql_r'],
+                                                'status': i_t['status'], 'is_in_mysql': i_t['is_in_mysql']} for i_t
+                                               in res_list]))
                     else:
                         self.write(json.dumps({'name': 'epg info of id dont match media_id in database'}))
                 else:
@@ -101,4 +105,16 @@ class DatabaseSearch(tornado.web.RequestHandler):
             self.write(json.dumps({'name': 'no media_id in database table in ResTable'}))
 
     post = get
+
+
+class SearchDelete(tornado.web.RequestHandler):
+    def get(self):
+        r_id = self.get_argument('rid')
+        SqliteQuery.delete_id_and_mysql_url(r_id)
+        self.write('delete {} success'.format(r_id))
+
+if __name__ == '__main__':
+    r_id = '80'
+    SqliteQuery.delete_id_and_mysql_url(r_id)
+
 

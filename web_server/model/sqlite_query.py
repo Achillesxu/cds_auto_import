@@ -105,12 +105,10 @@ class SqliteQuery(object):
 
     @staticmethod
     def query_media_id_in_res_table(in_media_id):
-        res_dict = sqlite_interface.query_media_id_in_res_table(in_media_id)
-        if res_dict is not None:
-            if res_dict['media_id']:
-                return res_dict
-            else:
-                return None
+        # res_dict = sqlite_interface.query_media_id_in_res_table(in_media_id)
+        ret_list = sqlite_interface.query_media_id_in_res_table_all(in_media_id)
+        if ret_list:
+            return ret_list
         else:
             return None
 
