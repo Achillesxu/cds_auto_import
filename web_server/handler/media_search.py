@@ -90,7 +90,7 @@ class DatabaseSearch(tornado.web.RequestHandler):
                     ret_dict = json.loads(ret_response.body.decode(encoding='utf-8'))
                     if res_list[0]['media_id'] == ret_dict.get('id', ''):
                         # self.write(json.dumps({'name': ret_dict['title'], 'media_id': res_dict['media_id']}))
-                        self.write(json.dumps([{'id': i_t['id'], 'name': 'test', 'media_id': i_t['media_id'],
+                        self.write(json.dumps([{'id': i_t['id'], 'name': ret_dict['title'], 'media_id': i_t['media_id'],
                                                 'url': i_t['url'], 'xml': i_t['xml'], 'mysql_r': i_t['mysql_r'],
                                                 'status': i_t['status'], 'is_in_mysql': i_t['is_in_mysql']} for i_t
                                                in res_list]))
