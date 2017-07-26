@@ -98,7 +98,7 @@ def main():
         port = int(sys.argv[1])
     except:
         # port = 8888
-        port = 15010
+        port = 15001
 
     global server
 
