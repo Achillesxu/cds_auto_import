@@ -110,8 +110,11 @@ class DatabaseSearch(tornado.web.RequestHandler):
 class SearchDelete(tornado.web.RequestHandler):
     def get(self):
         r_id = self.get_argument('rid')
-        SqliteQuery.delete_id_and_mysql_url(r_id)
-        self.write('delete {} success'.format(r_id))
+        ret_val = SqliteQuery.delete_id_and_mysql_url(r_id)
+        if ret_val:
+            self.write('delete {} success'.format(r_id))
+        else:
+            self.write('delete {} failure'.format(r_id))
 
 if __name__ == '__main__':
     r_id = '80'

@@ -102,6 +102,7 @@ class SqliteQuery(object):
                 sqlite_interface.delete_data_from_cdn_id(in_tuple[4])
                 sqlite_interface.delete_entity_from_cid_table(int(in_tuple[4]) - 100000)
                 sqlite_interface.insert_one_deleted_asset_id(int(in_tuple[4]) - 100000)
+            return del_access
 
     @staticmethod
     def query_media_id_in_res_table(in_media_id):

@@ -34,7 +34,7 @@ class XmlParser(object):
         try:
             root = fromstring(in_str)
         except:
-            r_log.error(traceback.format_exc())
+            r_log.error('xml_str <{}>---error <{}>'.format(in_str, traceback.format_exc()))
             return None
         if root is not None:
             r_order_dict = OrderedDict()
