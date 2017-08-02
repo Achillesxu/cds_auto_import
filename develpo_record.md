@@ -37,3 +37,5 @@
 
 ## 2017-08-01
 1. 修改搜索页删除提示
+2. 调整清理cidtable
+3. 调整trans_transfer_status_to_percent函数

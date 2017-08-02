@@ -25,7 +25,7 @@ pj_dict = parameters_parse.get_para_dict()
 def clear_data_in_cid_table():
 
     all_cnt = sqlite_interface.get_res_table_count()
-    result_tuple_list = sqlite_interface.get_res_table_record_list(1, all_cnt)
+    result_tuple_list = sqlite_interface.get_res_table_record_list(0, all_cnt)
 
     asset_id_list = []
 
@@ -49,3 +49,4 @@ def clear_data_in_cid_table():
 
 if __name__ == '__main__':
     clear_data_in_cid_table()
+    print('clear over')

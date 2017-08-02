@@ -28,19 +28,23 @@ class SqliteQuery(object):
     """
     @staticmethod
     def trans_transfer_status_to_percent(tuple_one):
-        xml_bytes = tuple_one[6].encode(encoding='utf-8')
-        xml_dict = xml_parser.XmlParser.parse_string(xml_bytes)
-        if xml_dict is not None:
-            percent_list = []
-            for k, v in xml_dict.items():
-                if 'Output_' in k:
-                    pp_str = v.get('percentComplete', '')
-                    percent_list.append(str(pp_str))
+        if tuple_one[6]:
+            xml_bytes = tuple_one[6].encode(encoding='utf-8')
+            xml_dict = xml_parser.XmlParser.parse_string(xml_bytes)
+            if xml_dict is not None:
+                percent_list = []
+                for k, v in xml_dict.items():
+                    if 'Output_' in k:
+                        pp_str = v.get('percentComplete', '')
+                        percent_list.append(str(pp_str))
 
-            percent_str = '-'.join(percent_list)
+                percent_str = '-'.join(percent_list)
 
-            return (tuple_one[0], tuple_one[1], tuple_one[2], tuple_one[3], tuple_one[4], tuple_one[5], percent_str,
-                    tuple_one[7], tuple_one[8], tuple_one[9])
+                return (tuple_one[0], tuple_one[1], tuple_one[2], tuple_one[3], tuple_one[4], tuple_one[5], percent_str,
+                        tuple_one[7], tuple_one[8], tuple_one[9])
+            else:
+                return (tuple_one[0], tuple_one[1], tuple_one[2], tuple_one[3], tuple_one[4], tuple_one[5], 'None',
+                        tuple_one[7], tuple_one[8], tuple_one[9])
         else:
             return (tuple_one[0], tuple_one[1], tuple_one[2], tuple_one[3], tuple_one[4], tuple_one[5], 'None',
                     tuple_one[7], tuple_one[8], tuple_one[9])
