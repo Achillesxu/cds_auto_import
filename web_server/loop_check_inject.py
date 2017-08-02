@@ -76,6 +76,8 @@ def loop_check_inject_insert_mysql():
                                     percent_list.append(1 if int(v['percentComplete']) == 100 else 0)
                                     state_list.append(1 if str(v['state']) == 'Complete' else 0)
                         if fail_sign is True:
+                            log_root.warning('delete record media_id-<{}>-cid-<{}>-req_xml-<{}>,, error_xml-<{}>'.
+                                             format(i_en[0], i_en[1], i_en[3], ret_xml))
                             g_status = -1
                             data_ret1 = sqlite_interface.delete_data_from_cdn_id(asset_id)
                             data_ret2 = sqlite_interface.delete_entity_from_cid_table(int(asset_id) - 100000)

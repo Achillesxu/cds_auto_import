@@ -122,7 +122,8 @@ if __name__ == '__main__':
                                     sqlite_interface.delete_entity_from_cid_table(failed_asset_id)
                                     sqlite_interface.insert_one_deleted_asset_id(failed_asset_id)
                                     r_log.error(
-                                        'inject action {} failed, code <{}>---->{}'.format(i_cid, s_code, str_xml_str))
+                                        'inject action media_id-<{}>-cid-{} failed, code <{}>---->{}'.
+                                        format(k, i_cid, s_code, str_xml_str))
                                 print(o_xml_str)
                             else:
                                 failed_asset_id = int(new_cid_set_d['assetid']) - 100000

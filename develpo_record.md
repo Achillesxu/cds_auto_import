@@ -39,3 +39,5 @@
 1. 修改搜索页删除提示
 2. 调整清理cidtable
 3. 调整trans_transfer_status_to_percent函数
+4. loop_check_inject_insert_mysql 发生错误时，记录删除的数据库记录相关信息
+5. 注入主函数，注入错误，将错误的具体信息记录下来
