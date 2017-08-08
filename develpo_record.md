@@ -41,3 +41,6 @@
 3. 调整trans_transfer_status_to_percent函数
 4. loop_check_inject_insert_mysql 发生错误时，记录删除的数据库记录相关信息
 5. 注入主函数，注入错误，将错误的具体信息记录下来
+
+## 2017-08-08
+1. 填写409的xml记录，调用数码接口进行删除
