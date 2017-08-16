@@ -100,6 +100,8 @@ class SqliteQuery(object):
             else:
                 del_access = False
             if del_access:
+                # record the deleted xml
+                sqlite_interface.insert_deleted_injected_record(in_tuple[3])
                 if in_tuple[2] == 1:
                     mysql_interface.mysql_delete_url(m_dict['url'])
 

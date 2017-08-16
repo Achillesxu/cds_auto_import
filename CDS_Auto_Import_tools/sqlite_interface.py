@@ -18,6 +18,7 @@ import sys
 import os
 import json
 from pony.orm import *
+from datetime import datetime
 
 from CDS_Auto_Import_tools import parameters_parse
 
@@ -49,6 +50,11 @@ class CidTable(db_lite.Entity):
 
 class DeletedAssetID(db_lite.Entity):
     asset_id = Required(int, size=32, index=True, unique=True)
+
+
+class InjectedDeleted(db_lite.Entity):
+    date_del = Required(datetime)
+    req_xml = Required(str)
 
 
 data_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -335,6 +341,25 @@ def query_injected_info_in_mysql():
                     format(traceback.format_exc()))
         return None
 
+
+@db_session
+def insert_deleted_injected_record(in_req_xml):
+    """
+
+    :param in_req_xml:
+    :return:
+    """
+    try:
+        in_date = datetime.now()
+        InjectedDeleted(date_del=in_date, req_xml=in_req_xml)
+        commit()
+        return True
+    except:
+        r_log.error('insert InjectedDeleted failed, in_req_xml <{}>, reason <{}>'.
+                    format(in_req_xml, traceback.format_exc()))
+        return None
+
+
 if __name__ == '__main__':
     # i_input_dict = {
     #     'media_type': 1, 'media_id': 'BE2C3790D0B80A7DDA6906CA65C1B73F',
@@ -390,11 +415,12 @@ if __name__ == '__main__':
     # print(ddd)
     # res_dict = query_media_id_in_res_table('1BBE91802CC568A3B3752CE24475BB80')
     # print(res_dict)
-    q_list = get_res_table_record_list_page(5200, 100)
-    if q_list:
-        print(len(q_list))
-        print(q_list[0][3])
-        print(q_list[-1][3])
-    else:
-        print('nothing')
+    # q_list = get_res_table_record_list_page(5200, 100)
+    # if q_list:
+    #     print(len(q_list))
+    #     print(q_list[0][3])
+    #     print(q_list[-1][3])
+    # else:
+    #     print('nothing')
+    print(insert_deleted_injected_record('test this'))
 
