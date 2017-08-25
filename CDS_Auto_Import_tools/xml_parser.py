@@ -83,12 +83,40 @@ class XmlParser(object):
         xml_string = tostring(et, encoding='utf-8', method="xml", xml_declaration=True)
         return xml_string
 
+    @staticmethod
+    def get_xml_assetid_and_subid(in_put_xml_str):
+        res_dict = dict()
+        try:
+            root = fromstring(in_put_xml_str)
+        except:
+            r_log.error('xml_str <{}>---error <{}>'.format(in_put_xml_str, traceback.format_exc()))
+            return None
+        if root is not None:
+            k_r_l = root.keys()
+            for i in k_r_l:
+                if 'providerID' == i:
+                    res_dict['providerID'] = root.get(i)
+                if 'assetID' == i:
+                    res_dict['assetID'] = root.get(i)
+            res_dict['subIDs'] = []
+            ch_e_list = list(root)
+            for j in ch_e_list:
+                k_r_l = j.keys()
+                for k in k_r_l:
+                    if 'subID' == k:
+                        res_dict['subIDs'].append(j.get(k))
+            return res_dict
+        else:
+            return None
+
 
 if __name__ == '__main__':
     test_xml = """<?xml version='1.0' encoding='utf-8'?>
 <TransferContent providerID="meixun" assetID="Z67610c5f861d427af80" transferBitRate="20000000" volumeName="volumeA" responseURL="http://10.255.46.99:15001/push_status" startNext="false"><Input subID="2800013" sourceURL="http://10.255.46.99:5002/Fbd509021e58875fc12bd7544c14dfa30.m3u8?token=1494765725_477&amp;gid=Z67610c561135d137acfcf446529d58fe&amp;channel=tianhua" serviceType="3"/><Input subID="4480022" sourceURL="http://10.255.46.99:5002/F9badd2ace3c108125ca89017aa5ca0a0.m3u8?token=1494765725_477&amp;gid=Z67610c561135d137acfcf446529d58fe&amp;channel=tianhua" serviceType="3"/><Input subID="7500220" sourceURL="http://10.255.46.99:5002/Fa0bffc7a57bd1e4f046a3abf1e65f9b4.m3u8?token=1494765725_477&amp;gid=Z67610c561135d137acfcf446529d58fe&amp;channel=tianhua" serviceType="3"/></TransferContent>"""
     test_bytes = test_xml.encode(encoding='utf-8')
-    r_dict = XmlParser.parse_string(test_bytes)
-    print(r_dict)
-    r_str = XmlParser.get_query_str(test_bytes, 'CancelTransfer', 403)
-    print(r_str)
+    # r_dict = XmlParser.parse_string(test_bytes)
+    # print(r_dict)
+    # r_str = XmlParser.get_query_str(test_bytes, 'CancelTransfer', 403)
+    # print(r_str)
+    r_d = XmlParser.get_xml_assetid_and_subid(test_bytes)
+    print(r_d)
