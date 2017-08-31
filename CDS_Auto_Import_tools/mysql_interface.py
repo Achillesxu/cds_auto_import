@@ -152,6 +152,18 @@ def mysql_delete_url(in_url):
 
 
 @db_session
+def mysql_query_url(in_url):
+    try:
+        en_t_list = select((p.idx, p.url, p.provider_id) for p in Url if p.provider_id == 200 and p.url == in_url)[:]
+        commit()
+        return en_t_list
+    except:
+        r_log.error('query record provider_id==200>> failed, error <{}>'.
+                    format(traceback.format_exc()))
+        return None
+
+
+@db_session
 def query_shuma_record():
     try:
         en_t_list = select((p.idx, p.url, p.provider_id) for p in Url if p.provider_id == 200)[:]
@@ -164,27 +176,31 @@ def query_shuma_record():
 
 
 if __name__ == '__main__':
-    m_v_dict = {'id': '08E2927DC4A1C344B2F275D53D67C900',
-                'create_utc': 1234567890,
-                'modify_utc': 12345678901,
-                'title': 'fuck table'}
-
-    if mysql_insert_media(m_v_dict):
-        print('insert media success')
-    else:
-        print('insert media failed')
-
-    v_dict1 = {'media_id': '08E2927DC4A1C344B2F275D53D67C900',
-               'url': 'http://1:1/vod/meixun_123.m3u8',
-               'serial': int(1),
-               'isfinal': 1,
-               'provider_id': 200,
-               'quality_id': 7,
-               'thumbnail_url': '',
-               'image_url': '',
-               'title': '',
-               'description': ''}
-    ret_val = mysql_insert_url(v_dict1)
-    print('insert {} '.format(ret_val))
+    # m_v_dict = {'id': '08E2927DC4A1C344B2F275D53D67C900',
+    #             'create_utc': 1234567890,
+    #             'modify_utc': 12345678901,
+    #             'title': 'fuck table'}
+    #
+    # if mysql_insert_media(m_v_dict):
+    #     print('insert media success')
+    # else:
+    #     print('insert media failed')
+    #
+    # v_dict1 = {'media_id': '08E2927DC4A1C344B2F275D53D67C900',
+    #            'url': 'http://1:1/vod/meixun_123.m3u8',
+    #            'serial': int(1),
+    #            'isfinal': 1,
+    #            'provider_id': 200,
+    #            'quality_id': 7,
+    #            'thumbnail_url': '',
+    #            'image_url': '',
+    #            'title': '',
+    #            'description': ''}
+    # ret_val = mysql_insert_url(v_dict1)
+    # print('insert {} '.format(ret_val))
     # mysql_read_url()
     # mysql_read_media()
+    q_url = 'http://10.255.218.180:8060/vod/123_101764.m3u8?bitrate=782-1469-2459-3908'
+    t_list = mysql_query_url(q_url)
+    if t_list:
+        print(t_list)
