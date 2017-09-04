@@ -52,6 +52,7 @@ if __name__ == '__main__':
         # 包含 media_id 去重
         media_id_dict.update(col_m_id_dict)
 
+    inject_num = 0
     for k, v in media_id_dict.items():
         rr.epg_cur_media_type = v
         media_urls_list = rr.get_media_detail_info(k)
@@ -115,6 +116,9 @@ if __name__ == '__main__':
                                                   }
                                     sq_dict['mysql_url_record'] = json.dumps(mysql_dict, ensure_ascii=False)
                                     sqlite_interface.insert_data_to_database(sq_dict)
+                                    inject_num += 1
+                                    if inject_num > int(pj_dict['inject_count']):
+                                        break
                                 else:
                                     sq_dict['transfer_content_ret_code'] = s_code
                                     sq_dict['status'] = -1
@@ -135,7 +139,10 @@ if __name__ == '__main__':
 
         else:
             r_log.warning('column <{}>, media_id <{}> with nothing'.format(v, k))
+        if inject_num > int(pj_dict['inject_count']):
+            break
 
     # end
     end_time = time.time()
-    print('process time is <{}>'.format(end_time - start_time))
+    print('process time is <{}>, success to inject num is <{}>, please wait for the ending of media injecting!!!'.
+          format((end_time - start_time), inject_num))

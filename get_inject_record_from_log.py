@@ -54,7 +54,7 @@ def get_assetid_from_xml(in_xml_str):
 
 
 def get_shuma_assetid_from_file():
-    file_shuma = 'asset_ingestTime_finishTime_status.txt'
+    file_shuma = 'new_get_shuma.txt'
     asset_dict = defaultdict(list)
     ret_dict = dict()
     with open(file_shuma, mode='r') as pf:
@@ -250,4 +250,5 @@ if __name__ == '__main__':
     # for k, v in ab_dict.items():
     #     if k not in a_list:
     #         print('still {}-----<{}>'.format(k, v))
-    clear_all_main_entrance()
+    # clear_all_main_entrance()
+    get_shuma_assetid_from_file()
