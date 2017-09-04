@@ -64,10 +64,11 @@ def get_shuma_assetid_from_file():
                 id_rate = s_p[0].split(sep='_')
                 asset_dict[id_rate[0]].append((s_p[1], id_rate[1]))
 
-    for ki, vi in asset_dict.items():
-        res_list = sorted(vi, key=lambda it: datetime.strptime(it[0], '%Y-%m-%d %H:%M:%S'))
-        ret_dict[ki] = [p[1] for p in res_list]
-    return ret_dict
+    # for ki, vi in asset_dict.items():
+    #     res_list = sorted(vi, key=lambda it: datetime.strptime(it[0], '%Y-%m-%d %H:%M:%S'))
+    #     ret_dict[ki] = [p[1] for p in res_list]
+    # return ret_dict
+    return asset_dict
 
 
 def get_delete_xml_str(in_asset_id, rate_list):
@@ -233,6 +234,31 @@ def clear_all_main_entrance():
     print('we coped with assetid list <{}>'.format(sql_del_list))
 
 
+def clear_wrong_rate_record():
+    del_dict = dict()
+    sql_del_list = []
+    a_dict = get_shuma_assetid_from_file()
+    for k, v in a_dict.items():
+        if len(v) > 4:
+            del_dict[k] = [i[1] for i in v]
+            sql_del_list.append(k)
+
+    for k, v in del_dict.items():
+        byte_xml_str = get_delete_xml_str(k, v)
+        time.sleep(0.1)
+        d_ret = delete_shuma_xml_record(byte_xml_str)
+        if d_ret:
+            print('>>>>>shuma delete {} ok'.format(k))
+        else:
+            print('>>>>>shuma delete {} ng'.format(k))
+
+    ret_failed_list = mysql_record_delete(sql_del_list)
+    need_remove_res_table = list(set(sql_del_list) - set(ret_failed_list))
+    sql_record_delete(need_remove_res_table)
+    print('mysql url need to delete failed list <<{}>>'.format(ret_failed_list))
+    print('we coped with assetid list <{}>'.format(sql_del_list))
+
+
 if __name__ == '__main__':
     # d_list, a_list = get_log_record(sys.argv[1])
     # with open('shuma_delete.txt', mode='w', encoding='utf-8') as wf:
@@ -251,4 +277,4 @@ if __name__ == '__main__':
     #     if k not in a_list:
     #         print('still {}-----<{}>'.format(k, v))
     # clear_all_main_entrance()
-    get_shuma_assetid_from_file()
+    clear_wrong_rate_record()

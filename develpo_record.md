@@ -60,3 +60,4 @@
 
 ## 2017-09-04
 1. 限制单次注入的数量，修改注入主接口程序，修改配置文件，将注入数量限制写入配置文件。
+2. get_inject_record_from_log.py添加clear_wrong_rate_record函数，删除码率错误的记录。
