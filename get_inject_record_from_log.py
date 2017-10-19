@@ -16,6 +16,7 @@ import sys
 import re
 import time
 import json
+import csv
 from datetime import datetime
 from collections import OrderedDict
 from collections import defaultdict
@@ -69,6 +70,25 @@ def get_shuma_assetid_from_file():
         ret_dict[ki] = [p[1] for p in res_list]
     return ret_dict, asset_dict
     # return asset_dict
+
+
+def get_shuma_assetid_from_csv(input_csv):
+    if os.path.exists(input_csv) and os.path.isfile(input_csv):
+        asset_dict = defaultdict(list)
+        ret_dict = dict()
+        with open(input_csv, newline='') as csvfile:
+            read_lines = csv.reader(csvfile)
+            for r_i in read_lines:
+                if 'asset_id' not in r_i:
+                    id_rate = r_i[0].split(sep='_')
+                    asset_dict[id_rate[0]].append((r_i[4], id_rate[1]))
+        for ki, vi in asset_dict.items():
+            res_list = sorted(vi, key=lambda it: datetime.strptime(it[0], '%Y/%m/%d %H:%M:%S'))
+            ret_dict[ki] = [p[1] for p in res_list]
+        return ret_dict, asset_dict
+    else:
+        print('input csv file path problem, please check again!!!')
+        return None, None
 
 
 def get_delete_xml_str(in_asset_id, rate_list):
@@ -145,7 +165,8 @@ def delete_shuma_xml_record(input_byte_str):
 
 
 def clear_all_main_entrance():
-    a_dict, asset_dict = get_shuma_assetid_from_file()
+    # a_dict, asset_dict = get_shuma_assetid_from_file()
+    a_dict, asset_dict = get_shuma_assetid_from_csv('chaxun_asset_id_20170930.csv')
     a_count = 0
     for k, v in a_dict.items():
         a_count += len(v)
@@ -275,6 +296,7 @@ def query_cid_table():
     # print('find right count <{}>'.format(count_x))
     # print('cid_table record len <{}>'.format(len(a_list_set)))
     return res_list
+
 
 if __name__ == '__main__':
     # d_list, a_list = get_log_record(sys.argv[1])
