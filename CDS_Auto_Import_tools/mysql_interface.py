@@ -175,6 +175,24 @@ def query_shuma_record():
         return None
 
 
+@db_session
+def mysql_query_url_and_update_media(in_old, in_new):
+    try:
+        en_t_list = select(p for p in Url if p.provider_id == 200 and p.media_id == Media[in_old])[:]
+        commit()
+        if en_t_list:
+            for ii in en_t_list:
+                ii.media_id = in_new
+        else:
+            r_log.info('no record in {} need to amend!!!'.format(in_old))
+        commit()
+        return True
+    except:
+        r_log.error('mysql_query_url_and_update_media {} failed, error <{}>'.
+                    format(in_old, traceback.format_exc()))
+        return None
+
+
 if __name__ == '__main__':
     # m_v_dict = {'id': '08E2927DC4A1C344B2F275D53D67C900',
     #             'create_utc': 1234567890,
@@ -200,7 +218,9 @@ if __name__ == '__main__':
     # print('insert {} '.format(ret_val))
     # mysql_read_url()
     # mysql_read_media()
-    q_url = 'http://10.255.218.180:8060/vod/123_101764.m3u8?bitrate=782-1469-2459-3908'
-    t_list = mysql_query_url(q_url)
-    if t_list:
-        print(t_list)
+    # q_url = 'http://10.255.218.180:8060/vod/123_101764.m3u8?bitrate=782-1469-2459-3908'
+    # t_list = mysql_query_url(q_url)
+    # if t_list:
+    #     print(t_list)
+    ret_vale = mysql_query_url_and_update_media('08E2927DC4A1C344B2F275D53D67C900', '08E2927DC4A1C344B2F275D53D67C901')
+    print('ret_val = {}'.format(ret_vale))

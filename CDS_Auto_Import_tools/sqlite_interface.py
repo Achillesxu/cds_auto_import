@@ -165,11 +165,36 @@ def delete_entity_from_cid_table(input_asset_id):
 
 
 @db_session
-def get_query_status_from_res_table():
+def query_and_update_media_cid_in_cid_table(in_old_media_id, in_new_media_id):
     try:
-        ent_tuple_list = select((p.media_id, p.sub_cid, p.sub_cdn_id, p.req_xml_str, p.mysql_url_record)
-                                for p in ResTable if (p.status == 1 or p.status == 2)
-                                and p.transfer_content_ret_code == 200 and p.is_mysql_insert == 0)[:]
+        en_t_list = select(p for p in CidTable if in_old_media_id in p.media_cid)[:]
+        commit()
+        if en_t_list:
+            for ii in en_t_list:
+                sp_list = ii.media_cid.split('_')
+                sp_list[0] = in_new_media_id
+                ii.media_cid = '_'.join(sp_list)
+        else:
+            r_log.info('no {} records in CidTable'.format(in_old_media_id))
+        commit()
+        return True
+    except:
+        r_log.error('query_and_update_media_cid_in_cid_table <{}>  failed, reason <{}>'.
+                    format(in_old_media_id, traceback.format_exc()))
+        return None
+
+
+@db_session
+def get_query_status_from_res_table(error_in=0):
+    try:
+        if error_in == 0:
+            ent_tuple_list = select((p.media_id, p.sub_cid, p.sub_cdn_id, p.req_xml_str, p.mysql_url_record)
+                                    for p in ResTable if (p.status == 1 or p.status == 2)
+                                    and p.transfer_content_ret_code == 200 and p.is_mysql_insert == 0)[:]
+        else:
+            ent_tuple_list = select((p.media_id, p.sub_cid, p.sub_cdn_id, p.req_xml_str, p.mysql_url_record)
+                                    for p in ResTable if p.status == -1
+                                    and p.transfer_content_ret_code == 200 and p.is_mysql_insert == 0)[:]
         commit()
         return ent_tuple_list
     except:
@@ -326,6 +351,27 @@ def query_media_id_in_res_table_all(in_media_id):
 
 
 @db_session
+def query_media_id_and_update_in_res_table(in_old_media_id, in_new_media_id):
+    try:
+        en_t_list = select(p for p in ResTable if p.media_id == in_old_media_id)[:]
+        commit()
+        if en_t_list:
+            for ii in en_t_list:
+                ii.media_id = in_new_media_id
+                sql_dict = json.loads(ii.mysql_url_record, strict=False)
+                sql_dict['media_id'] = in_new_media_id
+                ii.mysql_url_record = json.dumps(sql_dict, ensure_ascii=False)
+        else:
+            r_log.info(''.format(in_old_media_id))
+        commit()
+        return True
+    except:
+        r_log.error('query and update media id <{}> in ResTable failed, reason <{}>'.
+                    format(in_old_media_id, traceback.format_exc()))
+        return None
+
+
+@db_session
 def query_injected_info_in_mysql():
     """
     get record inserted into mysql
@@ -378,9 +424,9 @@ if __name__ == '__main__':
     # r_dict = get_data_from_url_cid('Z67610c561135d137acfcf446529d58fe')
     # if r_dict:
     #     print(r_dict)
-    asset_id = '3a8bbce52f63b2b7936c'
-    g_status = 2
-    xml_strr = 'good performing_fffff'
+    # asset_id = '3a8bbce52f63b2b7936c'
+    # g_status = 2
+    # xml_strr = 'good performing_fffff'
     # data_ret = update_data_from_cdn_id(asset_id, g_status, xml_strr)
     # data_ret = delete_data_from_cdn_id(asset_id)
     # ret = get_query_status_from_res_table()
@@ -422,5 +468,9 @@ if __name__ == '__main__':
     #     print(q_list[-1][3])
     # else:
     #     print('nothing')
-    print(insert_deleted_injected_record('test this'))
+    # print(insert_deleted_injected_record('test this'))
+    print('ret_val = {}'.format(query_media_id_and_update_in_res_table('76B992C9D8585518BBDD5F2BD1A09A3',
+                                                                       '76B992C9D8585518BBDD5F2BD1A09A4')))
+    # print(query_and_update_media_cid_in_cid_table('BE2C3790D0B80A7DDA6906CA65C1B73F', '76B992C9D8585518BBDD5F2BD1A09A4'))
+
 

@@ -83,5 +83,6 @@ def main_entrance():
 
     r_log.info('Life is short, dont suck it and see!!!')
 
+
 if __name__ == '__main__':
     main_entrance()
