@@ -178,6 +178,15 @@ def query_shuma_record():
 @db_session
 def mysql_query_url_and_update_media(in_old, in_new):
     try:
+        Media[in_old]
+    except ObjectNotFound:
+        r_log.info('cant find media_id {} in media table'.format(in_old))
+        return True
+    except:
+        r_log.info('mysql_query_url_and_update_media find media_id {}'
+                   ' in media table error <{}>'.format(in_old, traceback.format_exc()))
+        return None
+    try:
         en_t_list = select(p for p in Url if p.provider_id == 200 and p.media_id == Media[in_old])[:]
         commit()
         if en_t_list:
