@@ -47,22 +47,24 @@ def get_epgs_title_serial(in_media_type, in_media_id, in_cid):
                                 p_size=page_size)
     try:
         d_dict = requests.get(detail_url, headers=q_headers).json()
-        if int(d_dict['curSerial']) > 5:
-            more_detail_url = REQ_URL.format(ip=pj_dict['epg_addr']['ip'],
-                                             port=pj_dict['epg_addr']['port'],
-                                             template=pj_dict['epg_template'],
-                                             columnid=in_media_type,
-                                             m_id=in_media_id,
-                                             start_p=start_page,
-                                             p_size=d_dict['curSerial'])
-            d_dict = requests.get(more_detail_url, headers=q_headers).json()
-        r_title = d_dict['title']
-        for ii in d_dict['urls']:
-            if in_cid in ii['url']:
-                r_serial = int(ii['serial'])
-                break
+        if d_dict:
+            if int(d_dict['curSerial']) > 5:
+                more_detail_url = REQ_URL.format(ip=pj_dict['epg_addr']['ip'],
+                                                 port=pj_dict['epg_addr']['port'],
+                                                 template=pj_dict['epg_template'],
+                                                 columnid=in_media_type,
+                                                 m_id=in_media_id,
+                                                 start_p=start_page,
+                                                 p_size=d_dict['curSerial'])
+                d_dict = requests.get(more_detail_url, headers=q_headers).json()
+            r_title = d_dict['title']
+            for ii in d_dict['urls']:
+                if in_cid in ii['url']:
+                    r_serial = int(ii['serial'])
+                    break
+        else:
+            return r_title, r_serial
         return r_title, r_serial
-
     except:
         r_log.error('request <{}>, error <{}>'.format(detail_url, traceback.format_exc()))
         return r_title, r_serial
