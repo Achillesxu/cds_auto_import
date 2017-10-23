@@ -79,30 +79,18 @@ class InjectStatusHomePage(BaseHandler):
         title = 'inject_status'
         records_info = sqlite_query.SqliteQuery.query_res_table_count(page, 100)
 
-        o_rec_tup_list = []
-        http_cli = AsyncHTTPClient()
-        i_epg_ip = pj_dict['epg_addr']['ip']
-        i_epg_port = pj_dict['epg_addr']['port']
-        i_epg_template = pj_dict['epg_template']
-
-        detail_url_list = [EPG_MEDIA_INFO_URL.format(ip=i_epg_ip, port=i_epg_port, template=i_epg_template,
-                                                     columnid=i[9], m_id=i[1]) for i in records_info['records']]
-        response_tup = yield [http_cli.fetch(i) for i in detail_url_list]
-        title_id_list = [(json.loads(i.body.decode(encoding='utf-8')).get('title', ''),
-                          json.loads(i.body.decode(encoding='utf-8')).get('id', '')) for i in response_tup]
-        for ri, ti in zip(records_info['records'], title_id_list):
-            if ri[1] == ti[1]:
-                i_item = (*ri, ti[0])
-            else:
-                i_item = (*ri, '')
-            o_rec_tup_list.append(i_item)
+        o_rec_list = []
+        for ii in records_info['records']:
+            i_list = list(ii[:11])
+            i_list[-1] = '{}-{}'.format(i_list[-1], ii[-1])
+            o_rec_list.append(i_list)
 
         self.echo('inject_status.html', {
             'title': title,
             'current_page': page,
             'total_page': records_info['total_page'],
             'total_num': records_info['total_num'],
-            'record_list': o_rec_tup_list,
+            'record_list': o_rec_list,
         }, layout='_layout_.html')
 
 

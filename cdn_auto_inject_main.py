@@ -14,6 +14,7 @@ import logging
 import time
 import json
 
+from CDS_Auto_Import_tools import xml_parser
 from CDS_Auto_Import_tools import parameters_parse
 from CDS_Auto_Import_tools.get_media_from_request import RequestEpg
 from CDS_Auto_Import_tools import sqlite_interface
@@ -40,10 +41,30 @@ def get_json_str(input_str):
 
 if __name__ == '__main__':
     start_time = time.time()
+    # clean injected failed records
+    en_tu_list = sqlite_interface.get_query_status_from_res_table(error_in=-1)
+    if en_tu_list is None:
+        pass
+    else:
+        if en_tu_list:
+            for i_en in en_tu_list:
+                status_bytes = xml_parser.XmlParser.get_query_str(i_en[3].encode(encoding='utf-8'),
+                                                                  'DeleteContent', 201)
+                ret_status = RequestCDN.delete_content(status_bytes)
+                if ret_status is not None and (ret_status == 200 or ret_status == 404):
+                    del_access = True
+                else:
+                    del_access = False
+                if del_access:
+                    # record the deleted xml
+                    sqlite_interface.insert_deleted_injected_record(i_en[3])
+                    sqlite_interface.delete_data_from_cdn_id(i_en[4])
+                    sqlite_interface.delete_entity_from_cid_table(int(i_en[4]) - 100000)
+                    sqlite_interface.insert_one_deleted_asset_id(int(i_en[4]) - 100000)
     rr = RequestEpg()
     sq_dict = dict()
     media_id_dict = OrderedDict()
-    rr.check_media_list_len()  # 媒体索引从2---hot ，参见parameters.json文件中， media_type_dict
+    rr.check_media_list_len()
     # 获取当前模板下，所有的栏目的所有media_id的列表
     for i in rr.epg_media_list:
         rr.epg_cur_media_type = i
@@ -66,16 +87,20 @@ if __name__ == '__main__':
                     if cid_set_d:
                         continue
                     else:
+                        new_produce_asset_id = 0
                         del_asset_id = sqlite_interface.get_one_deleted_asset_id()
                         if del_asset_id is not None and del_asset_id > 0:
                             sqlite_interface.insert_cid_cid_table(media_cid_serial, del_asset_id)
                             sqlite_interface.delete_one_deleted_asset_id(del_asset_id)
                         else:
                             max_asset_id = sqlite_interface.get_max_id_from_cid_table()
+
                             if max_asset_id is None:
-                                sqlite_interface.insert_cid_cid_table(media_cid_serial, 1)
+                                new_produce_asset_id = 1
+                                sqlite_interface.insert_cid_cid_table(media_cid_serial, new_produce_asset_id)
                             else:
-                                sqlite_interface.insert_cid_cid_table(media_cid_serial, max_asset_id + 1)
+                                new_produce_asset_id = max_asset_id + 1
+                                sqlite_interface.insert_cid_cid_table(media_cid_serial, new_produce_asset_id)
 
                         new_cid_set_d = sqlite_interface.get_cid_query_result(media_cid_serial)
                         if new_cid_set_d:
@@ -84,6 +109,8 @@ if __name__ == '__main__':
                             sq_dict['media_id'] = k
                             sq_dict['sub_url'] = i_d['url']
                             sq_dict['sub_cid'] = i_cid
+                            sq_dict['media_id_title'] = i_d['title']
+                            sq_dict['media_id_serial'] = int(i_d['serial'])
                             sq_dict['sub_cdn_id'] = new_cid_set_d['assetid']
                             o_xml_str, o_bit_rate_str = rr.yield_xml_string(i_d, sq_dict['sub_cdn_id'])
                             if o_xml_str:
@@ -136,6 +163,12 @@ if __name__ == '__main__':
                                 r_log.error(
                                     'yield request cdn string error, request url--<{}>'.format(i_d['url'])
                                 )
+                        else:
+                            if del_asset_id is not None and del_asset_id > 0:
+                                sqlite_interface.delete_entity_from_cid_table(del_asset_id)
+                                sqlite_interface.insert_one_deleted_asset_id(del_asset_id)
+                            else:
+                                sqlite_interface.delete_entity_from_cid_table(new_produce_asset_id)
 
         else:
             r_log.warning('column <{}>, media_id <{}> with nothing'.format(v, k))

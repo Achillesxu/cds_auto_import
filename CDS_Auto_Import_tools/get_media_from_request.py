@@ -48,7 +48,7 @@ class RequestEpg(object):
         self.epg_ip = pj_dict['epg_addr']['ip']
         self.epg_port = pj_dict['epg_addr']['port']
         self.epg_template = pj_dict['epg_template']
-        self.epg_media_list = list(pj_dict['media_type_dict'].values())
+        self.epg_media_list = pj_dict['template_type_list']
         self.epg_cur_media_type = 0
         self.s = requests.Session()
 
@@ -133,7 +133,10 @@ class RequestEpg(object):
             r_dict = self.s.get(detail_url, headers=q_headers).json()
             d_page_count = r_dict['pagecount']
             d_total_count = r_dict['totalcount']
+            d_title = r_dict['title']
             for i_d_d in r_dict['urls']:
+                if not i_d_d['title']:
+                    i_d_d['title'] = d_title
                 urls_list.append(i_d_d)
         except:
             r_log.error(traceback.format_exc())
@@ -148,7 +151,10 @@ class RequestEpg(object):
                                                                 m_id=media_id, start_p=i_p,
                                                                 p_size=page_size)
                     r_dict = self.s.get(detail_url_next, headers=q_headers).json()
+                    d_title = r_dict['title']
                     for i_d_d in r_dict['urls']:
+                        if not i_d_d['title']:
+                            i_d_d['title'] = d_title
                         urls_list.append(i_d_d)
                 except:
                     r_log.error(traceback.format_exc())
@@ -269,9 +275,13 @@ class RequestEpg(object):
                         # replace ip to 10.255.46.99
                         cdn_ip = pj_dict['epg_cdn']['ip']
                         new_url = RequestEpg.replace_http_url_ip_to_ip_in_parameters(res__str, cdn_ip)
-                        res_d_list.append(OrderedDict([('subID', str(int(int(r_l[0]) / 1024))), ('sourceURL', new_url)]))
+                        # normal bit rate, according to the following:
+                        # real_rate = avg_rate * (1 + 10%) + 50
+                        real_sub_id = int(int(int(r_l[0]) / 1024) * (1 + 0.1)) + 50
+                        res_d_list.append(OrderedDict([('subID', str(real_sub_id)), ('sourceURL', new_url)]))
                     # print({'subID': r_l[0], 'sourceURL': r_l[1]})
-            if len(res_d_list) == 0:
+            # if the length of res_d_list, that's wrong with media_id-cid 2017-09-30
+            if len(res_d_list) == 0 or len(res_d_list) > 4:
                 return None
             else:
                 return res_d_list
@@ -311,6 +321,8 @@ if __name__ == '__main__':
     # print(RequestEpg.get_right_assetid_and_providerid('300000'))
     #
 
-    test_url = 'http://10.2.12.111:5002/Fee9f18b7451be784de48a7b1955c985b.m3u8?token=meixun&amp;gid=Z2f63403cd7646f3239d72e75c33ef625&amp;channel=tianhua'
-    new_http_url = RequestEpg.replace_http_url_ip_to_ip_in_parameters(test_url)
-    print(new_http_url)
+    # test_url = 'http://10.2.12.111:5002/Fee9f18b7451be784de48a7b1955c985b.m3u8?token=meixun&amp;gid=Z2f63403cd7646f3239d72e75c33ef625&amp;channel=tianhua'
+    # new_http_url = RequestEpg.replace_http_url_ip_to_ip_in_parameters(test_url)
+    # print(new_http_url)
+    rr = RequestEpg()
+    print(rr.epg_media_list)

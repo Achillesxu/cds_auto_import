@@ -121,6 +121,16 @@ def mysql_insert_media(v_dict):
 @db_session
 def mysql_insert_url(v_dict):
     try:
+        Media[v_dict['media_id']]
+    except ObjectNotFound:
+        r_log.error('*** mysql_insert_url without <{}> in media table, please check and delete any records'
+                    ' in ResTable of sqlite, error <{}>'.format(v_dict['media_id'], traceback.format_exc()))
+        return None
+    except:
+        r_log.error('*** mysql_insert_url query id in media table failed, error <{}>'.
+                    format(v_dict['media_id'], traceback.format_exc()))
+        return None
+    try:
         Url(media_id=v_dict['media_id'],
             url=v_dict['url'],
             serial=v_dict['serial'],
@@ -134,7 +144,7 @@ def mysql_insert_url(v_dict):
         commit()
         return True
     except:
-        r_log.error('insert <{}---{}> failed, error <{}>'.format(v_dict['media_id'],
+        r_log.error('mysql_insert_url insert <{}---{}> failed, error <{}>'.format(v_dict['media_id'],
                                                                  v_dict['url'], traceback.format_exc()))
         return None
 

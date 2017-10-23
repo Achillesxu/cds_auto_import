@@ -76,15 +76,36 @@ def loop_check_inject_insert_mysql():
                                     percent_list.append(1 if int(v['percentComplete']) == 100 else 0)
                                     state_list.append(1 if str(v['state']) == 'Complete' else 0)
                         if fail_sign is True:
-                            log_root.warning('delete record media_id-<{}>-cid-<{}>-req_xml-<{}>,, error_xml-<{}>'.
+                            log_root.warning('loop check, delete record media_id-<{}>-cid-<{}>-req_xml-<{}>,'
+                                             ' error_xml-<{}>'.
                                              format(i_en[0], i_en[1], i_en[3], ret_xml))
-                            g_status = -1
-                            data_ret1 = sqlite_interface.delete_data_from_cdn_id(asset_id)
-                            data_ret2 = sqlite_interface.delete_entity_from_cid_table(int(asset_id) - 100000)
-                            data_ret3 = sqlite_interface.insert_one_deleted_asset_id(int(asset_id) - 100000)
-                            if (data_ret1 is None or data_ret2 is None or data_ret3 is None) and g_status == -1:
-                                log_root.error('asset_id={}, g_status={}, post data = {}, database delete failed'.
-                                               format(asset_id, g_status, ret_xml))
+
+                            status_bytes = xml_parser.XmlParser.get_query_str(i_en[3].encode(encoding='utf-8'),
+                                                                              'DeleteContent', 201)
+                            ret_status = request_shuma_cdn.RequestCDN.delete_content(status_bytes)
+                            if ret_status is not None and (ret_status == 200 or ret_status == 404):
+                                g_status = -1
+                                data_ret1 = sqlite_interface.delete_data_from_cdn_id(asset_id)
+                                data_ret2 = sqlite_interface.delete_entity_from_cid_table(int(asset_id) - 100000)
+                                data_ret3 = sqlite_interface.insert_one_deleted_asset_id(int(asset_id) - 100000)
+                                if (data_ret1 is None or data_ret2 is None or data_ret3 is None) and g_status == -1:
+                                    log_root.error('asset_id={}, g_status={}, post data = {}, database delete failed'.
+                                                   format(asset_id, g_status, ret_xml))
+                            else:
+                                g_status = -1
+                                data_ret = sqlite_interface.update_data_from_cdn_id(asset_id, g_status, ret_xml, 0)
+                                if data_ret is None:
+                                    log_root.error('update delete shuma failed record error,'
+                                                   ' please delete them manually, please contact'
+                                                   ' xushiyin@chinatopip.com'
+                                                   ' to delete asset_id={}, g_status={}, post data = {}'.
+                                                   format(asset_id, g_status, ret_xml))
+                                else:
+                                    log_root.error('delete shuma media failed, the record will be deleted after'
+                                                   ' injected next time'
+                                                   ' to delete asset_id={}, g_status={}, post data = {}'.
+                                                   format(asset_id, g_status, ret_xml))
+
                         elif all(percent_list) and all(state_list):
                             g_status = 3
                             mysql_dict = json.loads(i_en[4], strict=False)

@@ -34,6 +34,8 @@ class ResTable(db_lite.Entity):
     media_id = Required(str)  # 媒资的id
     sub_url = Required(str)  # 媒资id下的url地址
     sub_cid = Required(str, index=True)  # 媒资id下的url地址的cid字符串
+    media_id_title = Optional(str, default='')
+    media_id_serial = Optional(int, default=1)
     sub_cdn_id = Required(str, index=True, unique=True)  # 注入到cdn是的assetID
     req_xml_str = Required(str)  # 请求cdn的post数据xml
     mysql_url_record = Required(str)  # 写入mysql的url表中的媒资数据
@@ -207,6 +209,7 @@ def insert_data_to_database(input_dict):
     try:
         ResTable(media_type=input_dict['media_type'], media_id=input_dict['media_id'],
                  sub_url=input_dict['sub_url'], sub_cid=input_dict['sub_cid'],
+                 media_id_title=input_dict['media_id_title'], media_id_serial=int(input_dict['media_id_serial']),
                  sub_cdn_id=input_dict['sub_cdn_id'], req_xml_str=input_dict['req_xml_str'],
                  mysql_url_record=input_dict['mysql_url_record'],
                  transfer_content_ret_code=input_dict['transfer_content_ret_code'],
@@ -305,10 +308,30 @@ def get_res_table_record_list(start_id, limit_num):
 
 
 @db_session
+def get_sub_cdn_id_update_title_serial_res_table(in_id_key, in_title, in_serial):
+    try:
+        p = ResTable[in_id_key]
+        commit()
+        p.media_id_title = in_title
+        p.media_id_serial = int(in_serial)
+        commit()
+        return True
+    except ObjectNotFound:
+        r_log.error('get_sub_cdn_id_update_title_serial_res_table--> id <{}> not found in ResTable, error <{}>'.
+                    format(in_id_key, traceback.format_exc()))
+        return None
+    except:
+        r_log.error('get_sub_cdn_id_update_title_serial_res_table--> id <{}> update ResTable title and serial,'
+                    ' error <{}>'.format(in_id_key, traceback.format_exc()))
+        return None
+
+
+@db_session
 def get_res_table_record_list_page(start_id, limit_num):
     try:
         ent_tuple_list = select((p.id, p.media_id, p.sub_cid, p.sub_cdn_id, p.mysql_url_record, p.status,
-                                 p.transfer_status, p.is_mysql_insert, p.req_xml_str, p.media_type) for p in
+                                 p.transfer_status, p.is_mysql_insert, p.req_xml_str, p.media_type,
+                                 p.media_id_title, p.media_id_serial) for p in
                                 ResTable).limit(int(limit_num), offset=int(start_id))
         commit()
         return ent_tuple_list
@@ -469,8 +492,23 @@ if __name__ == '__main__':
     # else:
     #     print('nothing')
     # print(insert_deleted_injected_record('test this'))
-    print('ret_val = {}'.format(query_media_id_and_update_in_res_table('76B992C9D8585518BBDD5F2BD1A09A3',
-                                                                       '76B992C9D8585518BBDD5F2BD1A09A4')))
+    # print('ret_val = {}'.format(query_media_id_and_update_in_res_table('76B992C9D8585518BBDD5F2BD1A09A3',
+    #                                                                    '76B992C9D8585518BBDD5F2BD1A09A4')))
     # print(query_and_update_media_cid_in_cid_table('BE2C3790D0B80A7DDA6906CA65C1B73F', '76B992C9D8585518BBDD5F2BD1A09A4'))
+    # input_dict1 = {
+    #     'media_type': 302,
+    #     'media_id': '76B992C9D8585518BBDD5F2BD1A09A23',
+    #     'sub_url': 'http://10.255.46.99:8000/tianhua/vod/playlist.m3u8?cid=Z67610c561135d137acfcf446529d58fe',
+    #     'sub_cid': 'Z67610c561135d137acfcf446529d58fe',
+    #     'media_id_title': '哈哈哈',
+    #     'media_id_serial': '1',
+    #     'sub_cdn_id': '1300101',
+    #     'req_xml_str': 'Z67610c561135d137acfcf446529d58fe',
+    #     'mysql_url_record': 'Z67610c561135d137acfcf446529d58fe',
+    #     'transfer_content_ret_code': 200,
+    #     'status': 1,
+    # }
+    # print(insert_data_to_database(input_dict1))
+    get_sub_cdn_id_update_title_serial_res_table(5, '谍影重重', 1)
 
 
