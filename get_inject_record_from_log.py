@@ -158,7 +158,7 @@ def mysql_record_delete(set_id_list):
 
 def delete_shuma_xml_record(input_byte_str):
     s_code = request_shuma_cdn.RequestCDN.delete_content(input_byte_str)
-    if s_code == 200:
+    if s_code == 200 or s_code == 404:
         return True
     else:
         return False

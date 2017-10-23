@@ -71,5 +71,6 @@
 3. 删除数码cdn，返回值404或者200，都认为是成功。
 4. 修改ResTable表添加media_id_title, media_id_serial列, 添加脚本用于将缺失的title和serial填写到修改的数据表中
 5. 修改inject_status接口的显示逻辑，title直接从数据库读取
+6. 通过页面搜索接口删除的，返回404认为数码正确删除
 
 

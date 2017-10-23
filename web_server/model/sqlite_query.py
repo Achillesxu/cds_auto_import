@@ -95,7 +95,7 @@ class SqliteQuery(object):
             status_bytes = xml_parser.XmlParser.get_query_str(in_tuple[3].encode(encoding='utf-8'),
                                                               'DeleteContent', 201)
             ret_status = request_shuma_cdn.RequestCDN.delete_content(status_bytes)
-            if ret_status is not None and ret_status == 200:
+            if ret_status is not None and (ret_status == 200 or ret_status == 404):
                 del_access = True
             else:
                 del_access = False
