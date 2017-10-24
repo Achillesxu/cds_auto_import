@@ -193,10 +193,9 @@ class RequestEpg(object):
         req_url = m_dict.get('url', '')
         if req_url:
             try:
-                # replace ip to 10.255.46.99
-                epg_ip = pj_dict['epg_addr']['ip']
-                new_url = RequestEpg.replace_http_url_ip_to_ip_in_parameters(req_url, epg_ip)
-                ret_v = self.s.get(new_url, headers=q_headers, stream=True)
+                # epg_ip = pj_dict['epg_addr']['ip']
+                # new_url = RequestEpg.replace_http_url_ip_to_ip_in_parameters(req_url, epg_ip)
+                ret_v = self.s.get(req_url, headers=q_headers, stream=True)
                 if ret_v.status_code == 200:
                     m3u8_str = ret_v.text
                 else:
@@ -272,13 +271,14 @@ class RequestEpg(object):
                         replace_token = pj_dict.get('play_token', '')
                         re_patt = re.compile(r'(?<=token=)\w+(?=&)')
                         res__str = re.sub(re_patt, replace_token, r_l[1])
+                        res__str = res__str + '&type=lan'
                         # replace ip to 10.255.46.99
-                        cdn_ip = pj_dict['epg_cdn']['ip']
-                        new_url = RequestEpg.replace_http_url_ip_to_ip_in_parameters(res__str, cdn_ip)
+                        # cdn_ip = pj_dict['epg_cdn']['ip']
+                        # new_url = RequestEpg.replace_http_url_ip_to_ip_in_parameters(res__str, cdn_ip)
                         # normal bit rate, according to the following:
                         # real_rate = avg_rate * (1 + 10%) + 50
                         real_sub_id = int(int(int(r_l[0]) / 1024) * (1 + 0.1)) + 50
-                        res_d_list.append(OrderedDict([('subID', str(real_sub_id)), ('sourceURL', new_url)]))
+                        res_d_list.append(OrderedDict([('subID', str(real_sub_id)), ('sourceURL', res__str)]))
                     # print({'subID': r_l[0], 'sourceURL': r_l[1]})
             # if the length of res_d_list, that's wrong with media_id-cid 2017-09-30
             if len(res_d_list) == 0 or len(res_d_list) > 4:
