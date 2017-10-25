@@ -195,6 +195,7 @@ class RequestEpg(object):
             try:
                 # epg_ip = pj_dict['epg_addr']['ip']
                 # new_url = RequestEpg.replace_http_url_ip_to_ip_in_parameters(req_url, epg_ip)
+                req_url += '&type=lan'
                 ret_v = self.s.get(req_url, headers=q_headers, stream=True)
                 if ret_v.status_code == 200:
                     m3u8_str = ret_v.text
@@ -271,7 +272,6 @@ class RequestEpg(object):
                         replace_token = pj_dict.get('play_token', '')
                         re_patt = re.compile(r'(?<=token=)\w+(?=&)')
                         res__str = re.sub(re_patt, replace_token, r_l[1])
-                        res__str = res__str + '&type=lan'
                         # replace ip to 10.255.46.99
                         # cdn_ip = pj_dict['epg_cdn']['ip']
                         # new_url = RequestEpg.replace_http_url_ip_to_ip_in_parameters(res__str, cdn_ip)
