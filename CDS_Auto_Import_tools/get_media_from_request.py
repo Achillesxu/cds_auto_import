@@ -193,10 +193,10 @@ class RequestEpg(object):
         req_url = m_dict.get('url', '')
         if req_url:
             try:
-                # epg_ip = pj_dict['epg_addr']['ip']
-                # new_url = RequestEpg.replace_http_url_ip_to_ip_in_parameters(req_url, epg_ip)
-                req_url += '&type=lan'
-                ret_v = self.s.get(req_url, headers=q_headers, stream=True)
+                epg_ip = pj_dict['epg_m3u8']['ip']
+                new_url = RequestEpg.replace_http_url_ip_to_ip_in_parameters(req_url, epg_ip)
+                new_url += '&type=lan'
+                ret_v = self.s.get(new_url, headers=q_headers, stream=True)
                 if ret_v.status_code == 200:
                     m3u8_str = ret_v.text
                 else:
