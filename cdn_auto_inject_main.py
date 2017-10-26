@@ -153,15 +153,18 @@ if __name__ == '__main__':
                                     sqlite_interface.delete_entity_from_cid_table(failed_asset_id)
                                     sqlite_interface.insert_one_deleted_asset_id(failed_asset_id)
                                     r_log.error(
-                                        'inject action media_id-<{}>-cid-{} failed, code <{}>---->{}'.
-                                        format(k, i_cid, s_code, str_xml_str))
+                                        'inject action'
+                                        ' media_id-<{}>-cid-{}-title-<{}>-serial-<{}> failed, code <{}>---->{}'.
+                                        format(k, i_cid, i_d['title'], i_d['serial'], s_code, str_xml_str))
                                 print(o_xml_str)
                             else:
                                 failed_asset_id = int(new_cid_set_d['assetid']) - 100000
                                 sqlite_interface.delete_entity_from_cid_table(failed_asset_id)
                                 sqlite_interface.insert_one_deleted_asset_id(failed_asset_id)
                                 r_log.error(
-                                    'yield request cdn string error, request url--<{}>'.format(i_d['url'])
+                                    'yield request cdn string error,'
+                                    ' request url--<{}>--media_id-<{}>--cid-{}-title-<{}>-serial-<{}>'.
+                                    format(i_d['url'], k, i_cid, i_d['title'], i_d['serial'])
                                 )
                         else:
                             if del_asset_id is not None and del_asset_id > 0:
