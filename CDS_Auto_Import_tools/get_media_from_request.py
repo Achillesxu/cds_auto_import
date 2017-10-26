@@ -192,19 +192,20 @@ class RequestEpg(object):
         """
         req_url = m_dict.get('url', '')
         if req_url:
+            epg_ip = pj_dict['epg_m3u8']['ip']
+            new_url = RequestEpg.replace_http_url_ip_to_ip_in_parameters(req_url, epg_ip)
+            new_url += '&type=lan'
             try:
-                epg_ip = pj_dict['epg_m3u8']['ip']
-                new_url = RequestEpg.replace_http_url_ip_to_ip_in_parameters(req_url, epg_ip)
-                new_url += '&type=lan'
                 ret_v = self.s.get(new_url, headers=q_headers, stream=True)
                 if ret_v.status_code == 200:
                     m3u8_str = ret_v.text
                 else:
-                    r_log.error('request <{}> failed, please check, reason: <{}>, ret_code <{}>'
-                                .format(req_url, traceback.format_exc(), ret_v.status_code))
+                    r_log.error('request <{}>--<{}> failed, please check, reason: <{}>, ret_code <{}>'
+                                .format(req_url, new_url, traceback.format_exc(), ret_v.status_code))
                     return None, None
             except:
-                r_log.error('request <{}> failed, please check, reason: <{}>'.format(req_url, traceback.format_exc()))
+                r_log.error('request <{}>--<{}> failed, please check, reason: <{}>'.
+                            format(req_url, new_url, traceback.format_exc()))
                 sys.exit()
         else:
             r_log.error('cant find url in media url, please check media url!!!!')
