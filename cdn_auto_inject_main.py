@@ -58,9 +58,9 @@ if __name__ == '__main__':
                 if del_access:
                     # record the deleted xml
                     sqlite_interface.insert_deleted_injected_record(i_en[3])
-                    sqlite_interface.delete_data_from_cdn_id(i_en[4])
-                    sqlite_interface.delete_entity_from_cid_table(int(i_en[4]) - 100000)
-                    sqlite_interface.insert_one_deleted_asset_id(int(i_en[4]) - 100000)
+                    sqlite_interface.delete_data_from_cdn_id(i_en[2])
+                    sqlite_interface.delete_entity_from_cid_table(int(i_en[2]) - 100000)
+                    sqlite_interface.insert_one_deleted_asset_id(int(i_en[2]) - 100000)
     rr = RequestEpg()
     sq_dict = dict()
     media_id_dict = OrderedDict()
