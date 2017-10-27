@@ -325,5 +325,10 @@ if __name__ == '__main__':
     # test_url = 'http://10.2.12.111:5002/Fee9f18b7451be784de48a7b1955c985b.m3u8?token=meixun&amp;gid=Z2f63403cd7646f3239d72e75c33ef625&amp;channel=tianhua'
     # new_http_url = RequestEpg.replace_http_url_ip_to_ip_in_parameters(test_url)
     # print(new_http_url)
-    rr = RequestEpg()
-    print(rr.epg_media_list)
+    # rr = RequestEpg()
+    # print(rr.epg_media_list)
+    old_url = 'http://10.6.8.90:8000/tianhua/vod/playlist.m3u8?cid=Z7b8f44465396e3d17640e7941d8ac206'
+    epg_ip = pj_dict['epg_m3u8']['ip']
+    print(epg_ip)
+    new_url = RequestEpg.replace_http_url_ip_to_ip_in_parameters(old_url, epg_ip)
+    print(new_url)
