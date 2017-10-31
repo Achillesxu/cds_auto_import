@@ -74,33 +74,16 @@ class DatabaseSearch(tornado.web.RequestHandler):
     @tornado.gen.coroutine
     def get(self):
         in_media_id = self.get_argument('media_id', '')
-        as_http_client1 = AsyncHTTPClient()
-        i_epg_ip = pj_dict['epg_addr']['ip']
-        i_epg_port = pj_dict['epg_addr']['port']
-        i_epg_template = pj_dict['epg_template']
 
         self.set_header('Content-Type', 'application/json;charset=UTF-8')
         res_list = SqliteQuery.query_media_id_in_res_table(in_media_id)
         if res_list is not None:
-            detail_url = EPG_MEDIA_INFO_URL.format(ip=i_epg_ip, port=i_epg_port, template=i_epg_template,
-                                                   columnid=res_list[0]['media_type'], m_id=res_list[0]['media_id'])
-            try:
-                ret_response = yield as_http_client1.fetch(detail_url)
-                if ret_response.code == 200:
-                    ret_dict = json.loads(ret_response.body.decode(encoding='utf-8'))
-                    if res_list[0]['media_id'] == ret_dict.get('id', ''):
-                        # self.write(json.dumps({'name': ret_dict['title'], 'media_id': res_dict['media_id']}))
-                        self.write(json.dumps([{'id': i_t['id'], 'name': ret_dict['title'], 'media_id': i_t['media_id'],
-                                                'url': i_t['url'], 'xml': i_t['xml'], 'mysql_r': i_t['mysql_r'],
-                                                'status': i_t['status'], 'is_in_mysql': i_t['is_in_mysql']} for i_t
-                                               in res_list]))
-                    else:
-                        self.write(json.dumps({'name': 'epg info of id dont match media_id in database'}))
-                else:
-                    self.write(json.dumps({'name': ret_response.reason}))
-            except:
-                root_myapp.error('request epg failed, reason <{}>'.format(traceback.format_exc()))
-                self.write(json.dumps({'name': traceback.format_exc()}))
+
+            self.write(json.dumps([{'id': i_t['id'], 'name': i_t['media_title'], 'media_serial': i_t['media_serial'],
+                                    'media_id': i_t['media_id'],
+                                    'url': i_t['url'], 'xml': i_t['xml'], 'mysql_r': i_t['mysql_r'],
+                                    'status': i_t['status'], 'is_in_mysql': i_t['is_in_mysql']} for i_t
+                                   in res_list]))
         else:
             self.write(json.dumps({'name': 'no media_id in database table in ResTable'}))
 
@@ -116,8 +99,10 @@ class SearchDelete(tornado.web.RequestHandler):
         else:
             self.write('delete {} failure'.format(r_id))
 
-if __name__ == '__main__':
-    r_id = '80'
-    SqliteQuery.delete_id_and_mysql_url(r_id)
 
+if __name__ == '__main__':
+    in_media_id1 = '9D7D81C6F2099E4C53CDEDD98B79CA9D'
+    en_list = SqliteQuery.query_media_id_in_res_table(in_media_id1)
+    for ii in en_list:
+        print(ii)
 
