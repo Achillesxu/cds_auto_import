@@ -192,7 +192,7 @@ def get_query_status_from_res_table(error_in=0):
         if error_in == 0:
             ent_tuple_list = select((p.media_id, p.sub_cid, p.sub_cdn_id, p.req_xml_str, p.mysql_url_record)
                                     for p in ResTable if (p.status == 1 or p.status == 2)
-                                    and p.transfer_content_ret_code == 200 and p.is_mysql_insert == 0)[:]
+                                    and p.transfer_content_ret_code == 200 and p.is_mysql_insert == 0)[:200]
         else:
             ent_tuple_list = select((p.media_id, p.sub_cid, p.sub_cdn_id, p.req_xml_str, p.mysql_url_record)
                                     for p in ResTable if p.status == -1

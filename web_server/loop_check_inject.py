@@ -12,6 +12,7 @@ import sys
 import json
 import traceback
 import requests
+import time
 
 from CDS_Auto_Import_tools import sqlite_interface
 from CDS_Auto_Import_tools import parameters_parse
@@ -44,7 +45,7 @@ def loop_check_inject_insert_mysql():
     循环检测ResTable里面的数据
     :return:
     """
-    log_root.info('loop_check_inject_insert_mysql')
+    # log_root.info('loop_check_inject_insert_mysql')
     en_tu_list = sqlite_interface.get_query_status_from_res_table()
     if en_tu_list is None:
         log_root.error('query sqlite ResTable wrong')
@@ -54,6 +55,7 @@ def loop_check_inject_insert_mysql():
             status_bytes = xml_parser.XmlParser.get_query_str(i_en[3].encode(encoding='utf-8'),
                                                               'GetTransferStatus', 0)
             ret_code, ret_xml = request_shuma_cdn.RequestCDN.get_transfer_status(status_bytes)
+            time.sleep(0.5)
             if ret_code == 200:
                 st_dict = xml_parser.XmlParser.parse_string(ret_xml.encode(encoding='utf-8'))
                 if st_dict:
@@ -134,7 +136,8 @@ def loop_check_inject_insert_mysql():
                 log_root.error('media_id <{}>, cid <{}>, cdn_id <{}>, getTransferStatus xml <{}>'
                                .format(i_en[0], i_en[1], i_en[2], status_bytes.decode(encoding='utf-8')))
     else:
-        log_root.info('all ResTable record finished! Boy')
+        # log_root.info('all ResTable record finished! Boy')
+        pass
 
 
 if __name__ == '__main__':
