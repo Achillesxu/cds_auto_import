@@ -54,10 +54,10 @@ if __name__ == '__main__':
     elif int(sys.argv[1]) == 4:
         if len(req_xml_list) > 0:
             for i in req_xml_list:
-                # status_bytes = xml_parser.XmlParser.get_query_str(i.encode(encoding='utf-8'), 'DeleteContent', 201)
+                status_bytes = xml_parser.XmlParser.get_query_str(i.encode(encoding='utf-8'), 'DeleteContent', 201)
                 time.sleep(0.2)
-                # print(status_bytes.decode(encoding='utf-8'))
-                s_code = request_shuma_cdn.RequestCDN.delete_content(i.encode(encoding='utf-8'))
+                print(status_bytes.decode(encoding='utf-8'))
+                s_code = request_shuma_cdn.RequestCDN.delete_content(status_bytes)
                 if s_code == 200:
                     print('delete good, <{}>'.format(i[8:140]))
                 else:
