@@ -107,7 +107,7 @@ def main():
 
     signal.signal(signal.SIGTERM, sig_handler)
     signal.signal(signal.SIGINT, sig_handler)
-    t_p_call = tornado.ioloop.PeriodicCallback(loop_check_inject.loop_check_inject_insert_mysql, 1000 * 60 * 5)
+    t_p_call = tornado.ioloop.PeriodicCallback(loop_check_inject.loop_check_inject_insert_mysql, 1000 * 60 * 10)
     t_p_call.start()
     tornado.ioloop.IOLoop.instance().start()
 

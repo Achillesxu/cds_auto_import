@@ -278,7 +278,20 @@ class RequestEpg(object):
                         # new_url = RequestEpg.replace_http_url_ip_to_ip_in_parameters(res__str, cdn_ip)
                         # normal bit rate, according to the following:
                         # real_rate = avg_rate * (1 + 10%) + 50
-                        real_sub_id = int(int(int(r_l[0]) / 1024) * (1 + 0.1)) + 50
+                        m3u8_rate = int(int(r_l[0]) / 1024)
+                        if m3u8_rate <= pj_dict['rate_range']['small']:
+                            real_sub_id = pj_dict['rate_range']['small']
+                        elif pj_dict['rate_range']['small'] < m3u8_rate <= pj_dict['rate_range']['medium']:
+                            real_sub_id = pj_dict['rate_range']['medium']
+                        elif pj_dict['rate_range']['medium'] < m3u8_rate <= pj_dict['rate_range']['big']:
+                            real_sub_id = pj_dict['rate_range']['big']
+                        elif pj_dict['rate_range']['big'] < m3u8_rate <= pj_dict['rate_range']['bigger']:
+                            real_sub_id = pj_dict['rate_range']['bigger']
+                        elif pj_dict['rate_range']['bigger'] < m3u8_rate <= pj_dict['rate_range']['biggest']:
+                            real_sub_id = pj_dict['rate_range']['biggest']
+                        else:
+                            real_sub_id = pj_dict['rate_range']['biggest']
+
                         res_d_list.append(OrderedDict([('subID', str(real_sub_id)), ('sourceURL', res__str)]))
                     # print({'subID': r_l[0], 'sourceURL': r_l[1]})
             # if the length of res_d_list, that's wrong with media_id-cid 2017-09-30

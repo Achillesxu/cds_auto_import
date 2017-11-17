@@ -51,5 +51,12 @@
     "user": "root",
     "passwd": "sunniwell"
   },
-  "inject_count": 2000
+  "inject_count": 2000,
+  "rate_range": {
+    "small": 1000,
+    "medium": 1700,
+    "big": 2800,
+    "bigger": 4500,
+    "biggest": 5500
+  }
 }

@@ -55,7 +55,7 @@ def loop_check_inject_insert_mysql():
             status_bytes = xml_parser.XmlParser.get_query_str(i_en[3].encode(encoding='utf-8'),
                                                               'GetTransferStatus', 0)
             ret_code, ret_xml = request_shuma_cdn.RequestCDN.get_transfer_status(status_bytes)
-            time.sleep(0.5)
+            time.sleep(0.8)
             if ret_code == 200:
                 st_dict = xml_parser.XmlParser.parse_string(ret_xml.encode(encoding='utf-8'))
                 if st_dict:
