@@ -194,7 +194,7 @@ class RequestEpg(object):
         if req_url:
             epg_ip = pj_dict['epg_m3u8']['ip']
             new_url = RequestEpg.replace_http_url_ip_to_ip_in_parameters(req_url, epg_ip)
-            new_url += '&type=lan'
+            new_url += '&type=lan&p2p=1'
             try:
                 ret_v = self.s.get(new_url, headers=q_headers, stream=True)
                 if ret_v.status_code == 200:
