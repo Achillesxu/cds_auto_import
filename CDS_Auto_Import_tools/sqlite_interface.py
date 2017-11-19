@@ -192,7 +192,7 @@ def get_query_status_from_res_table(error_in=0):
         if error_in == 0:
             ent_tuple_list = select((p.media_id, p.sub_cid, p.sub_cdn_id, p.req_xml_str, p.mysql_url_record)
                                     for p in ResTable if (p.status == 1 or p.status == 2)
-                                    and p.transfer_content_ret_code == 200 and p.is_mysql_insert == 0)[:200]
+                                    and p.transfer_content_ret_code == 200 and p.is_mysql_insert == 0)[:100]
         else:
             ent_tuple_list = select((p.media_id, p.sub_cid, p.sub_cdn_id, p.req_xml_str, p.mysql_url_record)
                                     for p in ResTable if p.status == -1
@@ -418,6 +418,23 @@ def query_injected_info_in_mysql():
 
 
 @db_session
+def query_mysql_record_ret_xml():
+    """
+    query all is_mysql_insert == 1
+    :return:
+    """
+    try:
+        en_t_list = select((p.media_id, p.mysql_url_record, p.transfer_status)
+                           for p in ResTable if p.is_mysql_insert == 1)[:]
+        commit()
+        return en_t_list
+    except:
+        r_log.error('query record that is_mysql_insert == 1 in ResTable failed, reason <{}>'.
+                    format(traceback.format_exc()))
+        return None
+
+
+@db_session
 def insert_deleted_injected_record(in_req_xml):
     """
 
@@ -515,6 +532,8 @@ if __name__ == '__main__':
     #     'status': 1,
     # }
     # print(insert_data_to_database(input_dict1))
-    get_sub_cdn_id_update_title_serial_res_table(5, '谍影重重', 1)
+    # get_sub_cdn_id_update_title_serial_res_table(5, '谍影重重', 1)
+    for i in query_mysql_record_ret_xml():
+        print(i[0])
 
 

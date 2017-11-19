@@ -140,7 +140,8 @@ def mysql_insert_url(v_dict):
             thumbnail_url=v_dict['thumbnail_url'],
             image_url=v_dict['image_url'],
             title=v_dict['title'],
-            description=v_dict['description'])
+            description=v_dict['description'],
+            time_len=v_dict['time_len'])
         commit()
         return True
     except:
@@ -212,6 +213,33 @@ def mysql_query_url_and_update_media(in_old, in_new):
         return None
 
 
+@db_session
+def mysql_url_update_time_len(in_media_id, in_url, in_time_len):
+    try:
+        en_list = select(p for p in Url if p.provider_id == 200 and p.url == in_url
+                         and p.media_id == Media[in_media_id])[:]
+        commit()
+        if len(en_list) == 1:
+            if en_list[0].time_len > 0:
+                return True
+            else:
+                en_list[0].time_len = in_time_len
+                commit()
+                return True
+        elif len(en_list) > 1:
+            r_log.error('mysql_url_update_time_len update <{}> time_len, find media_id=<{}> more than 1, check this'.
+                        format(in_url, in_media_id))
+            return None
+        else:
+            r_log.error('mysql_url_update_time_len update <{}> time_len, cant find media_id=<{}>'.
+                        format(in_url, in_media_id))
+            return None
+    except Exception:
+        r_log.error('mysql_url_update_time_len update <{}> time_len failed, error <{}>'.
+                    format(in_url, traceback.format_exc()))
+        return None
+
+
 if __name__ == '__main__':
     # m_v_dict = {'id': '08E2927DC4A1C344B2F275D53D67C900',
     #             'create_utc': 1234567890,
@@ -232,7 +260,8 @@ if __name__ == '__main__':
     #            'thumbnail_url': '',
     #            'image_url': '',
     #            'title': '',
-    #            'description': ''}
+    #            'description': '',
+    #            'time_len': 7607}
     # ret_val = mysql_insert_url(v_dict1)
     # print('insert {} '.format(ret_val))
     # mysql_read_url()
@@ -241,5 +270,9 @@ if __name__ == '__main__':
     # t_list = mysql_query_url(q_url)
     # if t_list:
     #     print(t_list)
-    ret_vale = mysql_query_url_and_update_media('08E2927DC4A1C344B2F275D53D67C900', '08E2927DC4A1C344B2F275D53D67C901')
-    print('ret_val = {}'.format(ret_vale))
+    # ret_vale = mysql_query_url_and_update_media('08E2927DC4A1C344B2F275D53D67C900', '08E2927DC4A1C344B2F275D53D67C901')
+    # print('ret_val = {}'.format(ret_vale))
+    in_url_ = 'http://10.255.218.180:8060/vod/123_104590.m3u8?bitrate=2734'
+    in_media_id_ = '08E2927DC4A1C344B2F275D53D67C901'
+    in_time_len_ = 7689
+    mysql_url_update_time_len(in_media_id_, in_url_, in_time_len_)

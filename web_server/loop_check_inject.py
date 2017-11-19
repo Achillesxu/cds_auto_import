@@ -55,7 +55,7 @@ def loop_check_inject_insert_mysql():
             status_bytes = xml_parser.XmlParser.get_query_str(i_en[3].encode(encoding='utf-8'),
                                                               'GetTransferStatus', 0)
             ret_code, ret_xml = request_shuma_cdn.RequestCDN.get_transfer_status(status_bytes)
-            time.sleep(0.8)
+            time.sleep(2)
             if ret_code == 200:
                 st_dict = xml_parser.XmlParser.parse_string(ret_xml.encode(encoding='utf-8'))
                 if st_dict:
@@ -68,6 +68,7 @@ def loop_check_inject_insert_mysql():
 
                         percent_list = list()
                         state_list = list()
+                        time_len_list = list()
                         fail_sign = False
                         for k, v in st_dict.items():
                             if 'Output_' in k:
@@ -77,6 +78,8 @@ def loop_check_inject_insert_mysql():
                                 else:
                                     percent_list.append(1 if int(v['percentComplete']) == 100 else 0)
                                     state_list.append(1 if str(v['state']) == 'Complete' else 0)
+                                    if v.get('duration', 0):
+                                        time_len_list.append(v['duration'])
                         if fail_sign is True:
                             log_root.warning('loop check, delete record media_id-<{}>-cid-<{}>-req_xml-<{}>,'
                                              ' error_xml-<{}>'.
@@ -112,6 +115,13 @@ def loop_check_inject_insert_mysql():
                             g_status = 3
                             mysql_dict = json.loads(i_en[4], strict=False)
                             print(mysql_dict)
+                            try:
+                                mysql_dict['time_len'] = max([int(i) for i in time_len_list])
+                            except Exception as e:
+                                log_root.error('get media duration error <{}>, media_id <{}>, cid <{}>,'
+                                               ' cdn_id <{}>, <{}>'.
+                                               format(e, i_en[0], i_en[1], i_en[2], ret_xml))
+                                continue
                             my_ret = mysql_interface.mysql_insert_url(mysql_dict)
                             if my_ret is True:
                                 data_ret = sqlite_interface.update_data_from_cdn_id(asset_id, g_status, ret_xml, 1)

@@ -20,6 +20,7 @@ import traceback
 import json
 from CDS_Auto_Import_tools import mysql_interface
 from CDS_Auto_Import_tools import sqlite_interface
+from CDS_Auto_Import_tools.xml_parser import XmlParser
 
 MY_LOG_FILE_NAME = 'sqlite_to_mysql_url.log'
 
@@ -84,5 +85,30 @@ def main_entrance():
     r_log.info('Life is short, dont suck it and see!!!')
 
 
+def main_update_url_time_len():
+    sq_rec_list = sqlite_interface.query_mysql_record_ret_xml()
+    if not sq_rec_list:
+        if sq_rec_list is None:
+            r_log.error('query <is_mysql_insert == 1> sqlite failed, please contact xushiyin@chinatopip.com')
+        else:
+            r_log.info('sqlite Restable <is_mysql_insert == 1> is empty, please contact xushiyin@chinatopip.com')
+        sys.exit()
+    for i in sq_rec_list:
+        mysql_dict = json.loads(i[1], strict=False)
+        q_url = mysql_dict['url']
+        st_dict = XmlParser.parse_string(i[2].encode(encoding='utf-8'))
+        time_len_list = []
+        for k, v in st_dict.items():
+            if 'Output_' in k:
+                if v.get('duration', 0):
+                    time_len_list.append(v['duration'])
+        time_len = max([int(i) for i in time_len_list])
+        media_id = i[0]
+        ret_val = mysql_interface.mysql_url_update_time_len(media_id, q_url, time_len)
+        if ret_val is None:
+            r_log.error('<media_id><{}> update url <{}> time_len failed!'.format(media_id, q_url))
+
+
 if __name__ == '__main__':
-    main_entrance()
+    # main_entrance()
+    main_update_url_time_len()
