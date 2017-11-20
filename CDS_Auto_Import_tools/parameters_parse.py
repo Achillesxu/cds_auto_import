@@ -83,4 +83,4 @@ def get_para_dict():
 
 if __name__ == '__main__':
     if para_dict:
-        print(para_dict)
+        print(para_dict['template_type_list'])

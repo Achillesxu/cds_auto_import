@@ -71,7 +71,10 @@ if __name__ == '__main__':
         col_m_id_list = rr.get_media_list()
         col_m_id_dict = {k: i for k in col_m_id_list}
         # 包含 media_id 去重
-        media_id_dict.update(col_m_id_dict)
+        # media_id_dict.update(col_m_id_dict)
+        for k, v in col_m_id_dict.items():
+            if k not in media_id_dict:
+                media_id_dict[k] = v
 
     inject_num = 0
     for k, v in media_id_dict.items():

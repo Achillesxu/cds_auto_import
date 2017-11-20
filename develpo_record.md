@@ -92,3 +92,6 @@ media_search 搜索接口更新，直接读取数据库，不用再次访问接�
 1. 根据赵璐需求，注入的时候，将数码返回的时间信息duration写入到mysql的url表里面
 2. 将已经成功注入的mysql的url表中time_len记录写上
 
+## 2017-11-20
+1. 优先注入template_type_list排在前面的媒资
+
