@@ -5,7 +5,8 @@
     <title>#{title}</title>
     <link href="/static/favicon.ico" rel="icon" type="image/x-icon"/>
     <meta name="viewport"
-          content="target-densitydpi=device-dpi, width=device-width, initial-scale=1, user-scalable=no"/>
+          content="width=device-width, initial-scale=1, user-scalable=no"/>
+    <link href="/static/Bootstrap_login/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/static/style.css"/>
     <script type="text/javascript">
         function altRows(id) {
@@ -64,6 +65,18 @@
 
 </head>
 <body>
+    <nav class="navbar navbar-default navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li><a></a></li>
+                    <li><a class="btn btn-default" href="/logout">退出</a></li>
+                    <li><a></a></li>
+                    <li><a class="btn btn-default" href="/media_search">media search</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
 
 #{_content}
 

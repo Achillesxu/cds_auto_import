@@ -20,7 +20,7 @@ import tornado.web
 import tornado.gen
 from tornado.httpclient import AsyncHTTPClient, HTTPClient
 
-from web_server.handler.inject_status import BaseHandler
+from web_server.handler.inject_status import BaseHandler, authenticated
 from web_server.model.sqlite_query import SqliteQuery
 
 from CDS_Auto_Import_tools import parameters_parse
@@ -41,7 +41,7 @@ class MediaSearch(BaseHandler):
     """
     provider chinese, media_id search
     """
-
+    @authenticated
     def get(self):
         title = 'media_search'
         self.echo('media_search.html', {
@@ -64,7 +64,7 @@ class MediaSearch(BaseHandler):
                 detail_url_list = 'http://{ip}:{port}/data_search?media_id={media_id}'.\
                     format(ip='127.0.0.1', port=pj_dict['status_addr']['port'], media_id=in_media_id)
                 ret_response = yield as_http_client.fetch(detail_url_list)
-                res_list = json.loads(ret_response.body.decode(encoding='utf-8'))
+                res_list = json.loads(ret_response.body.decode(encoding='utf-8'), strict=False)
                 self.write(json.dumps(res_list))
             else:
                 self.write(json.dumps({'name': 'please check media_id len'}))
@@ -83,14 +83,15 @@ class DatabaseSearch(tornado.web.RequestHandler):
                                     'media_id': i_t['media_id'],
                                     'url': i_t['url'], 'xml': i_t['xml'], 'mysql_r': i_t['mysql_r'],
                                     'status': i_t['status'], 'is_in_mysql': i_t['is_in_mysql']} for i_t
-                                   in res_list]))
+                                   in res_list], ensure_ascii=False))
         else:
             self.write(json.dumps({'name': 'no media_id in database table in ResTable'}))
 
     post = get
 
 
-class SearchDelete(tornado.web.RequestHandler):
+class SearchDelete(BaseHandler):
+    @authenticated
     def get(self):
         r_id = self.get_argument('rid')
         ret_val = SqliteQuery.delete_id_and_mysql_url(r_id)
@@ -101,7 +102,7 @@ class SearchDelete(tornado.web.RequestHandler):
 
 
 if __name__ == '__main__':
-    in_media_id1 = '9D7D81C6F2099E4C53CDEDD98B79CA9D'
+    in_media_id1 = '4F1BC559965817B43C57CB508DE33A15'
     en_list = SqliteQuery.query_media_id_in_res_table(in_media_id1)
     for ii in en_list:
         print(ii)

@@ -36,6 +36,8 @@ stdout_info.setFormatter(stdout_formatter)
 root_myapp.addHandler(stdout_info)
 root_myapp.setLevel(logging.INFO)
 
+COOKIE_SECRET = '+l7bYWHnTt2jd9j1ydQKTDKKo9ONFkUdudoIvTwz29g='
+
 tornado.log.LogFormatter(fmt='[%(levelname)1.1s %(asctime)s %(module)s-%(funcName)s-%(lineno)d] %(message)s',
                          datefmt='%y-%m-%d %H:%M:%S')
 
@@ -51,11 +53,15 @@ class Application(tornado.web.Application):
 
         settings = dict(
             static_path=os.path.join(os.path.dirname(__file__), "web_server/static"),
+            cookie_secret=COOKIE_SECRET,
             autoescape=None,
             # debug=True,
         )
 
         handlers = [
+            (r'/', inject_status.HomePage),
+            (r'/login', inject_status.LoginPage),
+            (r'/logout', inject_status.LogoutPage),
             (r'/static/(.*)', tornado.web.StaticFileHandler, {'path': settings['static_path']}),
             (r'/inject_status', inject_status.InjectStatusHomePage),  # homepage entrance
             (r'/delete_record', inject_status.DeleteInjectRecord),
@@ -107,8 +113,8 @@ def main():
 
     signal.signal(signal.SIGTERM, sig_handler)
     signal.signal(signal.SIGINT, sig_handler)
-    t_p_call = tornado.ioloop.PeriodicCallback(loop_check_inject.loop_check_inject_insert_mysql, 1000 * 60 * 15)
-    t_p_call.start()
+    # t_p_call = tornado.ioloop.PeriodicCallback(loop_check_inject.loop_check_inject_insert_mysql, 1000 * 60 * 15)
+    # t_p_call.start()
     tornado.ioloop.IOLoop.instance().start()
 
     logging.info("Exit...")
