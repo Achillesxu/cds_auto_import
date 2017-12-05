@@ -60,7 +60,7 @@ class MediaSearch(BaseHandler):
                 self.write('{"error_code": 0, "name": "media_id must not be empty"}')
                 return
             self.set_header('Content-Type', 'application/json;charset=UTF-8')
-            if len(in_media_id) == 32:
+            if len(in_media_id) >= 30:
                 detail_url_list = 'http://{ip}:{port}/data_search?media_id={media_id}'.\
                     format(ip='127.0.0.1', port=pj_dict['status_addr']['port'], media_id=in_media_id)
                 ret_response = yield as_http_client.fetch(detail_url_list)

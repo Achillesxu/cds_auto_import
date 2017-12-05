@@ -295,7 +295,7 @@ class RequestEpg(object):
                         res_d_list.append(OrderedDict([('subID', str(real_sub_id)), ('sourceURL', res__str)]))
                     # print({'subID': r_l[0], 'sourceURL': r_l[1]})
             # if the length of res_d_list, that's wrong with media_id-cid 2017-09-30
-            if len(res_d_list) == 0 or len(res_d_list) > 4:
+            if len(res_d_list) == 0 or len(res_d_list) > 5:
                 return None
             else:
                 return res_d_list
